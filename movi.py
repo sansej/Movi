@@ -1,51 +1,32 @@
 from mutagen.mp3 import MP3 
-from PIL import Image, ImageDraw, ImageOps
+from PIL import Image
 import imageio 
 from moviepy import editor 
-from pathlib import Path 
 import os 
 from moviepy.editor import *
-# from ffmpeg import FFmpeg, Progress
-# import ffmpeg
 import numpy
-import wave
 import imageio
-import io
-import requests
-from elevenlabs import generate, play
+from elevenlabs import generate, save
 import moviepy.editor as mp
-from moviepy.video.fx.fadein import fadein
-from moviepy.video.fx.fadeout import fadeout
-import cv2
-from pydub import AudioSegment
-from pydub.playback import play
-
-key_eleven = '4a8b6658597f8c6d47d47674afc89e56'
+from elevenlabs import set_api_key
+set_api_key("4a8b6658597f8c6d47d47674afc89e56")
+key = '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'
+import openai
 
 def create_movi():
-    #пути к файлам
     audio_path = os.path.join(os.getcwd(), "audio\\audio.mp3") 
     video_path = os.path.join(os.getcwd(), "videos") 
     images_path = os.path.join(os.getcwd(), "images\\giphy")
-
-
     audio = MP3(audio_path) 
-    # длина аудио файла
     audio_length = audio.info.length 
-    
-    # создаем список картинок
     list_of_images = [] 
     for image_file in os.listdir(images_path): 
         if image_file.endswith('.png') or image_file.endswith('.jpg'): 
             image_path = os.path.join(images_path, image_file) 
             image = Image.open(image_path).resize((400, 400), Image.ANTIALIAS) 
             list_of_images.append(image) 
-
-    # из картинок создаем GIF файл
     duration = audio_length/len(list_of_images) 
     imageio.mimsave('images.gif', list_of_images, fps=1/duration)
-
-    #из аудио и GIF создаем видео файл и сохраняем в папку
     video = editor.VideoFileClip("images.gif") 
     audio = editor.AudioFileClip(audio_path) 
     final_video = video.set_audio(audio) 
@@ -53,35 +34,19 @@ def create_movi():
     final_video.write_videofile(fps=60, codec="libx264", filename="video.mp4") 
 
 def rescale_video():
-    
-    # loading video gfg
     clip = VideoFileClip("videos\\video.mp4")
-    
-    # getting subclip
     clip1 = clip.subclip(0, 7)
-    
-    # getting width and height of clip 1
     w1 = clip1.w
     h1 = clip1.h
-    
     print("Width x Height of clip 1 : ", end = " ")
     print(str(w1) + " x ", str(h1))
-    
     print("---------------------------------------")
-    
-    # resizing video downsize 50 % 
     clip2 = clip1.resize(0.5)
-    
-    # getting width and height of clip 1
     w2 = clip2.w
     h2 = clip2.h
-    
     print("Width x Height of clip 2 : ", end = " ")
     print(str(w2) + " x ", str(h2))
-    
     print("---------------------------------------")
-    
-    # showing final clip
     clip2.ipython_display()
 
 def crop_image(input_path = 'logo.jpg', output_path = 'croplogo.jpg'):
@@ -139,34 +104,38 @@ def create_transition(clip1_path = 'outlogo.mp4', clip2_path = 'out.mp4', output
     final_clip.write_videofile(output_file, codec="libx264", audio_codec="aac")
     final_clip.close()
 
-def voice(voice="Fin", output_file = 'out.mp3', text="Привет, сегодня раскажу об очень интерестном и прекрасном явлении, таком как северное сияние!"):
+def voice(voice="Fin", output_file = 'out.wav', text="Привет, сегодня раскажу об очень интерестном и прекрасном явлении, таком как северное сияние!"):
     audio = generate(
     text=text,
     voice = voice,
     model="eleven_multilingual_v2"
     )
-    audio_stream = io.BytesIO(audio)
-    with wave.open(output_file, 'wb') as wav_file:
-        wav_file.setnchannels(2)  # 1 channel (mono)
-        wav_file.setsampwidth(2)  # 2 bytes per sample
-        wav_file.setframerate(44100)  # Sample rate (you may need to adjust this)
-        wav_file.writeframes(audio_stream.read())
-    print(f"Audio saved as {output_file}")
+    save(audio, output_file)
 
-def combinate(video_path = 'output_video.mp4', audio_path = 'out.mp3', output_path = 'video_with_voice.mp4'):
-    # video_clip = mp.VideoFileClip(video_path)
-    # audio_clip = mp.AudioFileClip(audio_path)
-    # video_clip = video_clip.set_audio(audio_clip)
-    # video_clip.write_videofile(output_path, codec='libx264', audio_codec='aac')
-    # video_clip.close()
-    # audio_clip.close()
-    # Replace these file paths with your actual file paths
-    video_clip = VideoFileClip(video_path)
-    audio_clip = AudioSegment.from_mp3(audio_path)
+def combinate(video_path = 'output_video.mp4', audio_path = 'out.wav', output_path = 'video_with_voice.mp4'):
+    video_clip = mp.VideoFileClip(video_path)
+    audio_clip = mp.AudioFileClip(audio_path)
     video_clip = video_clip.set_audio(audio_clip)
     video_clip.write_videofile(output_path, codec='libx264', audio_codec='aac')
     video_clip.close()
+    audio_clip.close()
 
+def chatGPT():
+    client = openai.OpenAI()
+    openai.api_key = key
+    # defaults to getting the key using os.environ.get("OPENAI_API_KEY")
+    # if you saved the key under a different environment variable name, you can do something like:
+    # client = OpenAI(
+    #   api_key=os.environ.get("CUSTOM_ENV_NAME"),
+    # )
+    response = client.chat.completions.create(
+    model="gpt-3.5-turbo-1106",
+    response_format={ "type": "json_object" },
+    messages=[
+        {"role": "user", "content": "Who won the world series in 2020?"}
+    ]
+    )
+    print(response.choices[0].message.content)
 
 def main():
     # create_movi()
@@ -176,7 +145,8 @@ def main():
     # ken_burns_effect_video()
     # create_transition()
     # voice()
-    combinate()
+    # combinate()
+    chatGPT()
 
 if __name__ == "__main__":
     main()
