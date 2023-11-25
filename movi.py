@@ -7,62 +7,23 @@ import numpy
 import imageio
 from elevenlabs import generate, save, set_api_key
 import moviepy.editor as mp
-from pydub import AudioSegment
+from pydub import AudioSegment, effects
 import soundfile as sf
 import scipy.io.wavfile as wav
 set_api_key(os.environ.get("ELEVEN_KEY"))
 
-def create_movi():
-    audio_path = os.path.join(os.getcwd(), "audio\\audio.mp3") 
-    video_path = os.path.join(os.getcwd(), "videos") 
-    images_path = os.path.join(os.getcwd(), "images\\giphy")
-    audio = MP3(audio_path) 
-    audio_length = audio.info.length 
-    list_of_images = [] 
-    for image_file in os.listdir(images_path): 
-        if image_file.endswith('.png') or image_file.endswith('.jpg'): 
-            image_path = os.path.join(images_path, image_file) 
-            image = Image.open(image_path).resize((400, 400), Image.ANTIALIAS) 
-            list_of_images.append(image) 
-    duration = audio_length/len(list_of_images) 
-    imageio.mimsave('images.gif', list_of_images, fps=1/duration)
-    video = mp.VideoFileClip("images.gif") 
-    audio = mp.AudioFileClip(audio_path) 
-    final_video = video.set_audio(audio) 
-    os.chdir(video_path) 
-    final_video.write_videofile(fps=60, codec="libx264", filename="video.mp4") 
-
-def rescale_video():
-    clip = mp.VideoFileClip("videos\\video.mp4")
-    clip1 = clip.subclip(0, 7)
-    w1 = clip1.w
-    h1 = clip1.h
-    print("Width x Height of clip 1 : ", end = " ")
-    print(str(w1) + " x ", str(h1))
-    print("---------------------------------------")
-    clip2 = clip1.resize(0.5)
-    w2 = clip2.w
-    h2 = clip2.h
-    print("Width x Height of clip 2 : ", end = " ")
-    print(str(w2) + " x ", str(h2))
-    print("---------------------------------------")
-    clip2.ipython_display()
-
-def crop_image(input_path, output_path):
+def crop_image(input_path, output_path, resolution = (720, 1280)):
     original_image = Image.open(input_path).crop()
-    resolutions = [(1080, 1920), (720, 1280)]
-    for resolution in resolutions:
-        target_width, target_height = resolution
-        if original_image.width >= target_width and original_image.height >= target_height:
-            crop_box = ((original_image.width - target_width) // 2, (original_image.height - target_height) // 2,
+    target_width, target_height = resolution
+    if original_image.width >= target_width and original_image.height >= target_height:
+        crop_box = ((original_image.width - target_width) // 2, (original_image.height - target_height) // 2,
                         (original_image.width + target_width) // 2, (original_image.height + target_height) // 2)
-            cropped_image = original_image.crop(crop_box)
-            cropped_image.save(output_path)
-            print(f"Image cropped ({cropped_image.width} {cropped_image.height}) and saved to {output_path}")
-            return
-        else:
-            print(f"Image resolution ({original_image.width}x{original_image.height}) is less than {target_width}x{target_height}.")
-    print("The image is not suitable for cropping to the specified resolutions.")
+        cropped_image = original_image.crop(crop_box)
+        cropped_image.save(output_path)
+        print(f"Image cropped ({cropped_image.width} {cropped_image.height}) and saved to {output_path}")
+        return
+    else:
+        print(f"Image resolution ({original_image.width}x{original_image.height}) is less than {target_width}x{target_height}.")
 
 def ken_burns_effect_video(image_path, output_path, duration=10, zoom_factor=1.3, reverse=False, fps=30):
     img = Image.open(image_path)
@@ -140,21 +101,30 @@ def combinate(video_path, audio_path, output_path = 'video_with_voice.mp4', crop
         video_clip.close()
         audio_clip.close()
 
+def change_speed(input_path, output_path, format = 'wav', speed = 1.1):
+    sound = AudioSegment.from_file(input_path)
+    so = sound.speedup(playback_speed = speed)
+    so.export(output_path, format = format)
+
 def main():
     # crop_image(input_path='ntc.jpg', output_path='crop_ntc.jpg')
     # crop_image(input_path='wosp.jpg', output_path='crop_wosp.jpg')
     # ken_burns_effect_video(image_path='crop_ntc.jpg', output_path='crop_ntc.mp4', duration=5)
     # ken_burns_effect_video(image_path='crop_wosp.jpg', output_path='crop_wosp.mp4', duration=5)
     # create_transition(clip1_path='crop_ntc.mp4', clip2_path='crop_wosp.mp4')
-    text = '''Юпи́тер — крупнейшая планета Солнечной системы, 
-    пятая по удалённости от Солнца. Наряду с Сатурном Юпитер 
-    классифицируется как газовый гигант.
-    Планета была известна людям с глубокой древности, что нашло своё отражение 
-    в мифологии и религиозных верованиях различных культур: месопотамской, 
-    вавилонской, греческой и других. Современное название Юпи́тера происходит 
-    от имени древнеримского верховного бога-громовержца.'''
+    text = '''Юпи́тер – самая крупная планета в Солнечной системе. Её масса в 318 раз больше массы Земли,
+    а объем в 1300 раз больше. Если бы Юпи́тер был ещё чуть-чуть массивнее, он мог бы стать звездой,
+    так как в его ядре происходит процесс термоядерного синтеза, подобный тому, что происходит в звёздах.
+    На Юпи́тере есть впечатляющее магнитное поле, превосходящее магнитное поле любой другой планеты
+    в Солнечной системе. Это поле создает мощные радиальные лучи, наблюдаемые в районе полюсов. Эти
+    светящиеся лучи делают Юпи́тер еще более удивительным объектом для наблюдения. У Юпи́тера более 80
+    известных спутников. Самый известный из них – Ганимед, самый крупный спутник в Солнечной системе.
+    Ещё один известный спутник Юпи́тера – Ио – известен своими вулканическими извержениями и
+    ярко-красными пя́тнами на поверхности.'''
     # voice(text=text)
+    # change_speed(input_path='out.wav', output_path='final.wav')
     # combinate(video_path='output_video.mp4', audio_path='out.wav', crop=True)
+
 
 if __name__ == "__main__":
     main()
