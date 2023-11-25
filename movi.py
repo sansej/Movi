@@ -1,17 +1,16 @@
 from mutagen.mp3 import MP3 
 from PIL import Image
 import imageio 
-from moviepy import editor 
 import os 
-from moviepy.editor import *
+from moviepy.editor import concatenate_audioclips
 import numpy
 import imageio
-from elevenlabs import generate, save
+from elevenlabs import generate, save, set_api_key
 import moviepy.editor as mp
-from elevenlabs import set_api_key
-set_api_key("4a8b6658597f8c6d47d47674afc89e56")
-key = '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'
-import openai
+from pydub import AudioSegment
+import soundfile as sf
+import scipy.io.wavfile as wav
+set_api_key(os.environ.get("ELEVEN_KEY"))
 
 def create_movi():
     audio_path = os.path.join(os.getcwd(), "audio\\audio.mp3") 
@@ -27,14 +26,14 @@ def create_movi():
             list_of_images.append(image) 
     duration = audio_length/len(list_of_images) 
     imageio.mimsave('images.gif', list_of_images, fps=1/duration)
-    video = editor.VideoFileClip("images.gif") 
-    audio = editor.AudioFileClip(audio_path) 
+    video = mp.VideoFileClip("images.gif") 
+    audio = mp.AudioFileClip(audio_path) 
     final_video = video.set_audio(audio) 
     os.chdir(video_path) 
     final_video.write_videofile(fps=60, codec="libx264", filename="video.mp4") 
 
 def rescale_video():
-    clip = VideoFileClip("videos\\video.mp4")
+    clip = mp.VideoFileClip("videos\\video.mp4")
     clip1 = clip.subclip(0, 7)
     w1 = clip1.w
     h1 = clip1.h
@@ -49,7 +48,7 @@ def rescale_video():
     print("---------------------------------------")
     clip2.ipython_display()
 
-def crop_image(input_path = 'logo.jpg', output_path = 'croplogo.jpg'):
+def crop_image(input_path, output_path):
     original_image = Image.open(input_path).crop()
     resolutions = [(1080, 1920), (720, 1280)]
     for resolution in resolutions:
@@ -65,7 +64,7 @@ def crop_image(input_path = 'logo.jpg', output_path = 'croplogo.jpg'):
             print(f"Image resolution ({original_image.width}x{original_image.height}) is less than {target_width}x{target_height}.")
     print("The image is not suitable for cropping to the specified resolutions.")
 
-def ken_burns_effect_video(image_path = 'crop.jpg', output_path = 'out.mp4', duration=10, zoom_factor=1.3, reverse=True, fps=30):
+def ken_burns_effect_video(image_path, output_path, duration=10, zoom_factor=1.3, reverse=False, fps=30):
     img = Image.open(image_path)
     new_width = (img.width // 16) * 16
     new_height = (img.height // 16) * 16
@@ -89,7 +88,7 @@ def ken_burns_effect_video(image_path = 'crop.jpg', output_path = 'out.mp4', dur
             frame_array = numpy.array(frame)
             writer.append_data(frame_array)
 
-def create_transition(clip1_path = 'outlogo.mp4', clip2_path = 'out.mp4', output_file = 'output_video.mp4', overlap = 1, resize = True):
+def create_transition(clip1_path, clip2_path, output_file = 'output_video.mp4', overlap = 1, resize = False):
     clip1 = mp.VideoFileClip(clip1_path)
     clip2 = mp.VideoFileClip(clip2_path)
     if clip1.size!=clip2.size:
@@ -100,11 +99,11 @@ def create_transition(clip1_path = 'outlogo.mp4', clip2_path = 'out.mp4', output
         else:
             print("Warning: The incoming videos have different resolutions.")
             return
-    final_clip = CompositeVideoClip([clip1.crossfadeout(overlap), clip2.set_start(clip1.duration - overlap).crossfadein(overlap)])
+    final_clip = mp.CompositeVideoClip([clip1.crossfadeout(overlap), clip2.set_start(clip1.duration - overlap).crossfadein(overlap)])
     final_clip.write_videofile(output_file, codec="libx264", audio_codec="aac")
     final_clip.close()
 
-def voice(voice="Fin", output_file = 'out.wav', text="Привет, сегодня раскажу об очень интерестном и прекрасном явлении, таком как северное сияние!"):
+def voice(voice="Fin", output_file = 'out.wav', text=''):
     audio = generate(
     text=text,
     voice = voice,
@@ -112,41 +111,50 @@ def voice(voice="Fin", output_file = 'out.wav', text="Привет, сегодн
     )
     save(audio, output_file)
 
-def combinate(video_path = 'output_video.mp4', audio_path = 'out.wav', output_path = 'video_with_voice.mp4'):
+def combinate(video_path, audio_path, output_path = 'video_with_voice.mp4', crop=False):
     video_clip = mp.VideoFileClip(video_path)
     audio_clip = mp.AudioFileClip(audio_path)
-    video_clip = video_clip.set_audio(audio_clip)
-    video_clip.write_videofile(output_path, codec='libx264', audio_codec='aac')
-    video_clip.close()
-    audio_clip.close()
-
-def chatGPT():
-    client = openai.OpenAI()
-    openai.api_key = key
-    # defaults to getting the key using os.environ.get("OPENAI_API_KEY")
-    # if you saved the key under a different environment variable name, you can do something like:
-    # client = OpenAI(
-    #   api_key=os.environ.get("CUSTOM_ENV_NAME"),
-    # )
-    response = client.chat.completions.create(
-    model="gpt-3.5-turbo-1106",
-    response_format={ "type": "json_object" },
-    messages=[
-        {"role": "user", "content": "Who won the world series in 2020?"}
-    ]
-    )
-    print(response.choices[0].message.content)
+    video_durasion = video_clip.duration
+    audio_durasion = audio_clip.duration
+    if video_durasion!=audio_durasion:
+        print('Files have different durations!')
+        if crop and video_durasion>audio_durasion:
+            trimmed_video = video_clip.subclip(0, audio_durasion)
+            trimmed_video = trimmed_video.set_audio(audio_clip)
+            trimmed_video.write_videofile(output_path, codec='libx264', audio_codec='aac')
+            video_clip.close()
+            trimmed_video.close()
+            audio_clip.close()
+            return
+        if crop and video_durasion<audio_durasion:
+            trimmed_audio = audio_clip.subclip(0, video_durasion)
+            video_clip = video_clip.set_audio(trimmed_audio)
+            video_clip.write_videofile(output_path, codec='libx264', audio_codec='aac')
+            audio_clip.close()
+            trimmed_audio.close()
+            video_clip.close()
+            return
+    else:
+        video_clip = video_clip.set_audio(audio_clip)
+        video_clip.write_videofile(output_path, codec='libx264', audio_codec='aac')
+        video_clip.close()
+        audio_clip.close()
 
 def main():
-    # create_movi()
-    # rescale_video()
-    # ken_burns_effect()
-    # crop_image()
-    # ken_burns_effect_video()
-    # create_transition()
-    # voice()
-    # combinate()
-    chatGPT()
+    # crop_image(input_path='ntc.jpg', output_path='crop_ntc.jpg')
+    # crop_image(input_path='wosp.jpg', output_path='crop_wosp.jpg')
+    # ken_burns_effect_video(image_path='crop_ntc.jpg', output_path='crop_ntc.mp4', duration=5)
+    # ken_burns_effect_video(image_path='crop_wosp.jpg', output_path='crop_wosp.mp4', duration=5)
+    # create_transition(clip1_path='crop_ntc.mp4', clip2_path='crop_wosp.mp4')
+    text = '''Юпи́тер — крупнейшая планета Солнечной системы, 
+    пятая по удалённости от Солнца. Наряду с Сатурном Юпитер 
+    классифицируется как газовый гигант.
+    Планета была известна людям с глубокой древности, что нашло своё отражение 
+    в мифологии и религиозных верованиях различных культур: месопотамской, 
+    вавилонской, греческой и других. Современное название Юпи́тера происходит 
+    от имени древнеримского верховного бога-громовержца.'''
+    # voice(text=text)
+    # combinate(video_path='output_video.mp4', audio_path='out.wav', crop=True)
 
 if __name__ == "__main__":
     main()
