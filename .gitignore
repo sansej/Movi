@@ -4,4 +4,4 @@
 *.mp4
 *.wav
 .env
-.srt
+*.srt
