@@ -18,6 +18,7 @@ import matplotlib.pyplot as plt
 import requests
 # from PIL import Image
 import imageio 
+from subtitle import SubtitleEditor
 import os 
 from moviepy.video.tools.subtitles import SubtitlesClip
 from moviepy.config import change_settings
@@ -459,12 +460,18 @@ def main():
     # print("Formatted time: {}".format(formatted_time))
 
     # Пример использования
-    audio_file_path = 'final.wav'
-    segments = detect_audio_segments(audio_file_path)
+    # audio_file_path = 'final.wav'
+    # segments = detect_audio_segments(audio_file_path)
+    # print("Отрезки с звуком:")
+    # for i,segment in enumerate(segments,start=1):
+    #     print(i)
+    #     print(f"{segment[0]} --> {segment[1]}\n")
 
-    print("Отрезки с звуком:")
-    for segment in segments:
-        print(f"Начало: {segment[0]}, Конец: {segment[1]}")
+    # Пример использования функции
+    num_part = 58
+    result = SubtitleEditor.split_text(text, 58)
+    for i, part in enumerate(result):
+        print(f"Часть {i + 1}: {part.strip()}")
 
 
 
