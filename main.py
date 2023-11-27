@@ -12,11 +12,11 @@
 # import json
 # import wave
 # import sys
-import librosa.display
+# import librosa.display
 import matplotlib.pyplot as plt
-import librosa
+# import librosa
 import requests
-from PIL import Image
+# from PIL import Image
 import imageio 
 import os 
 from moviepy.video.tools.subtitles import SubtitlesClip
@@ -31,102 +31,102 @@ from moviepy.editor import VideoFileClip, TextClip, CompositeVideoClip
 
 
 # set_api_key(os.environ.get("ELEVEN_KEY"))
-deepgramapiKey=set_api_key(os.environ.get("DEEPGRAM_API_KEY"))
+# deepgramapiKey=set_api_key(os.environ.get("DEEPGRAM_API_KEY"))
 
-def crop_image(input_path, output_path, resolution = (720, 1280)):
-    original_image = Image.open(input_path).crop()
-    target_width, target_height = resolution
-    if original_image.width >= target_width and original_image.height >= target_height:
-        crop_box = ((original_image.width - target_width) // 2, (original_image.height - target_height) // 2,
-                        (original_image.width + target_width) // 2, (original_image.height + target_height) // 2)
-        cropped_image = original_image.crop(crop_box)
-        cropped_image.save(output_path)
-        print(f"Image cropped ({cropped_image.width} {cropped_image.height}) and saved to {output_path}")
-        return
-    else:
-        print(f"Image resolution ({original_image.width}x{original_image.height}) is less than {target_width}x{target_height}.")
+# def crop_image(input_path, output_path, resolution = (720, 1280)):
+#     original_image = Image.open(input_path).crop()
+#     target_width, target_height = resolution
+#     if original_image.width >= target_width and original_image.height >= target_height:
+#         crop_box = ((original_image.width - target_width) // 2, (original_image.height - target_height) // 2,
+#                         (original_image.width + target_width) // 2, (original_image.height + target_height) // 2)
+#         cropped_image = original_image.crop(crop_box)
+#         cropped_image.save(output_path)
+#         print(f"Image cropped ({cropped_image.width} {cropped_image.height}) and saved to {output_path}")
+#         return
+#     else:
+#         print(f"Image resolution ({original_image.width}x{original_image.height}) is less than {target_width}x{target_height}.")
 
-def ken_burns_effect_video(image_path, output_path, duration=10, zoom_factor=1.4, reverse=False, fps=30):
-    img = Image.open(image_path)
-    new_width = (img.width // 16) * 16
-    new_height = (img.height // 16) * 16
-    img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
-    frames = []
-    long = duration * fps
-    for i in range(long):
-        current_zoom = 1 + (zoom_factor - 1) * i / long
-        position = (
-            (img.width - img.width * current_zoom) / 2,
-            (img.height - img.height * current_zoom) / 2
-        )
-        frame = img.resize((int(img.width * current_zoom), int(img.height * current_zoom)), Image.Resampling.LANCZOS)
-        canvas = Image.new("RGB", img.size, "black")
-        canvas.paste(frame, box=(int(position[0]), int(position[1])))
-        frames.append(canvas)
-    if reverse:
-        frames = frames[::-1]
-    with imageio.get_writer(output_path, fps=fps) as writer:
-        for frame in frames:
-            frame_array = numpy.array(frame)
-            writer.append_data(frame_array)
-    print(f'{output_path} video file created')
+# def ken_burns_effect_video(image_path, output_path, duration=10, zoom_factor=1.4, reverse=False, fps=30):
+#     img = Image.open(image_path)
+#     new_width = (img.width // 16) * 16
+#     new_height = (img.height // 16) * 16
+#     img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
+#     frames = []
+#     long = duration * fps
+#     for i in range(long):
+#         current_zoom = 1 + (zoom_factor - 1) * i / long
+#         position = (
+#             (img.width - img.width * current_zoom) / 2,
+#             (img.height - img.height * current_zoom) / 2
+#         )
+#         frame = img.resize((int(img.width * current_zoom), int(img.height * current_zoom)), Image.Resampling.LANCZOS)
+#         canvas = Image.new("RGB", img.size, "black")
+#         canvas.paste(frame, box=(int(position[0]), int(position[1])))
+#         frames.append(canvas)
+#     if reverse:
+#         frames = frames[::-1]
+#     with imageio.get_writer(output_path, fps=fps) as writer:
+#         for frame in frames:
+#             frame_array = numpy.array(frame)
+#             writer.append_data(frame_array)
+#     print(f'{output_path} video file created')
 
-def create_transition(clip1_path, clip2_path, output_file = 'output_video.mp4', overlap = 1, resize = False):
-    clip1 = mp.VideoFileClip(clip1_path)
-    clip2 = mp.VideoFileClip(clip2_path)
-    if clip1.size!=clip2.size:
-        if resize:
-            common_height = min(clip1.size[1], clip2.size[1])
-            clip1 = clip1.resize(height=common_height)
-            clip2 = clip2.resize(height=common_height)
-        else:
-            print("Warning: The incoming videos have different resolutions.")
-            return
-    final_clip = mp.CompositeVideoClip([clip1.crossfadeout(overlap), clip2.set_start(clip1.duration - overlap).crossfadein(overlap)])
-    final_clip.write_videofile(output_file, codec="libx264", audio_codec="aac")
-    final_clip.close()
+# def create_transition(clip1_path, clip2_path, output_file = 'output_video.mp4', overlap = 1, resize = False):
+#     clip1 = mp.VideoFileClip(clip1_path)
+#     clip2 = mp.VideoFileClip(clip2_path)
+#     if clip1.size!=clip2.size:
+#         if resize:
+#             common_height = min(clip1.size[1], clip2.size[1])
+#             clip1 = clip1.resize(height=common_height)
+#             clip2 = clip2.resize(height=common_height)
+#         else:
+#             print("Warning: The incoming videos have different resolutions.")
+#             return
+#     final_clip = mp.CompositeVideoClip([clip1.crossfadeout(overlap), clip2.set_start(clip1.duration - overlap).crossfadein(overlap)])
+#     final_clip.write_videofile(output_file, codec="libx264", audio_codec="aac")
+#     final_clip.close()
 
-def voice(voice="Fin", output_file = 'out.wav', text=''):
-    audio = generate(
-    text=text,
-    voice = voice,
-    model="eleven_multilingual_v2"
-    )
-    save(audio, output_file)
+# def voice(voice="Fin", output_file = 'out.wav', text=''):
+#     audio = generate(
+#     text=text,
+#     voice = voice,
+#     model="eleven_multilingual_v2"
+#     )
+#     save(audio, output_file)
 
-def combinate(video_path, audio_path, output_path = 'video_with_voice.mp4', crop=False):
-    video_clip = mp.VideoFileClip(video_path)
-    audio_clip = mp.AudioFileClip(audio_path)
-    video_durasion = video_clip.duration
-    audio_durasion = audio_clip.duration
-    # if video_durasion!=audio_durasion:
-    #     print('Files have different durations!')
-    #     if crop and video_durasion>audio_durasion:
-    #         trimmed_video = video_clip.subclip(0, audio_durasion)
-    #         trimmed_video = trimmed_video.set_audio(audio_clip)
-    #         trimmed_video.write_videofile(output_path, codec='libx264', audio_codec='aac')
-    #         video_clip.close()
-    #         trimmed_video.close()
-    #         audio_clip.close()
-    #         return
-    #     if crop and video_durasion<audio_durasion:
-    #         trimmed_audio = audio_clip.subclip(0, video_durasion)
-    #         video_clip = video_clip.set_audio(trimmed_audio)
-    #         video_clip.write_videofile(output_path, codec='libx264', audio_codec='aac')
-    #         audio_clip.close()
-    #         trimmed_audio.close()
-    #         video_clip.close()
-    #         return
-    # else:
-    video_clip = video_clip.set_audio(audio_clip)
-    video_clip.write_videofile(output_path, codec='libx264', audio_codec='aac')
-    video_clip.close()
-    audio_clip.close()
+# def combinate(video_path, audio_path, output_path = 'video_with_voice.mp4', crop=False):
+#     video_clip = mp.VideoFileClip(video_path)
+#     audio_clip = mp.AudioFileClip(audio_path)
+#     video_durasion = video_clip.duration
+#     audio_durasion = audio_clip.duration
+#     # if video_durasion!=audio_durasion:
+#     #     print('Files have different durations!')
+#     #     if crop and video_durasion>audio_durasion:
+#     #         trimmed_video = video_clip.subclip(0, audio_durasion)
+#     #         trimmed_video = trimmed_video.set_audio(audio_clip)
+#     #         trimmed_video.write_videofile(output_path, codec='libx264', audio_codec='aac')
+#     #         video_clip.close()
+#     #         trimmed_video.close()
+#     #         audio_clip.close()
+#     #         return
+#     #     if crop and video_durasion<audio_durasion:
+#     #         trimmed_audio = audio_clip.subclip(0, video_durasion)
+#     #         video_clip = video_clip.set_audio(trimmed_audio)
+#     #         video_clip.write_videofile(output_path, codec='libx264', audio_codec='aac')
+#     #         audio_clip.close()
+#     #         trimmed_audio.close()
+#     #         video_clip.close()
+#     #         return
+#     # else:
+#     video_clip = video_clip.set_audio(audio_clip)
+#     video_clip.write_videofile(output_path, codec='libx264', audio_codec='aac')
+#     video_clip.close()
+#     audio_clip.close()
 
-def change_speed(input_path, output_path, format = 'wav', speed = 1.07):
-    sound = AudioSegment.from_file(input_path)
-    so = sound.speedup(playback_speed = speed)
-    so.export(output_path, format = format)
+# def change_speed(input_path, output_path, format = 'wav', speed = 1.07):
+#     sound = AudioSegment.from_file(input_path)
+#     so = sound.speedup(playback_speed = speed)
+#     so.export(output_path, format = format)
 
 # def subtitle_generator():
 #     # Замените этот список субтитрами вашими значениями
@@ -208,19 +208,19 @@ def convert_to_srt(data, output_filename):
             f.write(f"{start_time} --> {end_time}\n")
             f.write(f"{subtitle_text}\n\n")
 
-def getDeepgramTranscription(p_url):
-    url = "https://api.deepgram.com/v1/listen?smart_format=true&language=ru&model=whisper-medium"
-    payload = {
-        "url": p_url
-    }
-    headers = {
-        "Authorization": 'Token ' + str(deepgramapiKey),
-        "content-type": "application/json"
-    }
-    response = requests.request("POST", url, headers=headers, json=payload)
-    output = response.json()
-    print(output)
-    return output
+# def getDeepgramTranscription(p_url):
+#     url = "https://api.deepgram.com/v1/listen?smart_format=true&language=ru&model=whisper-medium"
+#     payload = {
+#         "url": p_url
+#     }
+#     headers = {
+#         "Authorization": 'Token ' + str(deepgramapiKey),
+#         "content-type": "application/json"
+#     }
+#     response = requests.request("POST", url, headers=headers, json=payload)
+#     output = response.json()
+#     print(output)
+#     return output
 
 def time_to_seconds(time_obj):
     return time_obj.hours * 3600 + time_obj.minutes * 60 + time_obj.seconds + time_obj.milliseconds / 1000
@@ -241,11 +241,48 @@ def create_subtitle_clips(subtitles, videosize,fontsize=80, font='Arial', color=
         subtitle_clips.append(text_clip.set_position(text_position))
     return subtitle_clips
 
-def mfccs():
-    audio_path = 'out.wav'
-    audio_signal, sampling_rate = librosa.load(audio_path)
-    mfccs = librosa.feature.mfcc(y=audio_signal, sr=sampling_rate)
-    print(mfccs)
+# def mfccs():
+#     audio_path = 'out.wav'
+#     audio_signal, sampling_rate = librosa.load(audio_path)
+#     mfccs = librosa.feature.mfcc(y=audio_signal, sr=sampling_rate)
+#     print(mfccs)
+
+def detect_audio_segments(audio_file_path, silence_threshold=-40, min_silence_duration=1000):
+    # Загрузка аудиофайла
+    audio = AudioSegment.from_file(audio_file_path)
+
+    # Преобразование в numpy array для удобства работы
+    audio_array = numpy.array(audio.get_array_of_samples())
+
+    # Определение отрезков с звуком
+    sound_segments = []
+    is_sound = False
+    start_time = 0
+
+    for i, sample in enumerate(audio_array):
+        if sample > silence_threshold:
+            if not is_sound:
+                start_time = i
+                is_sound = True
+        else:
+            if is_sound:
+                end_time = i
+                is_sound = False
+                duration = end_time - start_time
+                if duration > min_silence_duration:
+                    start_time_sec = start_time / audio.frame_rate
+                    end_time_sec = end_time / audio.frame_rate
+                    start_time_formatted = format_seconds(start_time_sec)
+                    end_time_formatted = format_seconds(end_time_sec)
+                    sound_segments.append((start_time_formatted, end_time_formatted))
+
+    return sound_segments
+
+def format_seconds(seconds):
+    hours, remainder = divmod(seconds, 3600)
+    minutes, seconds = divmod(remainder, 60)
+    microseconds = int((seconds % 1) * 1e6)
+    return f"{int(hours):02d}:{int(minutes):02d}:{int(seconds):02d},{microseconds:06d}"
 
 # def segment_audio_by_threshold(audio_signal, threshold=0.05, min_segment_length=1000):
 #     """
@@ -268,10 +305,10 @@ def mfccs():
 
 #     return valid_segments
 
-def to_normalized_array(audio_chunk, fs, librosa_fs):
-   samples = audio_chunk.get_array_of_samples()
-   arr = numpy.array(samples).astype(numpy.float32) / numpy.iinfo(numpy.int16).max
-   return librosa.core.resample(arr, fs, librosa_fs)
+# def to_normalized_array(audio_chunk, fs, librosa_fs):
+#    samples = audio_chunk.get_array_of_samples()
+#    arr = numpy.array(samples).astype(numpy.float32) / numpy.iinfo(numpy.int16).max
+#    return librosa.core.resample(arr, fs, librosa_fs)
 
 def segment_audio_by_threshold(audio_signal, threshold=0.05, min_segment_length=1000):
     above_threshold = audio_signal > threshold
@@ -370,7 +407,6 @@ def main():
     # final_video.write_videofile(output_video_file)
 
     # mp3url = "https://static.deepgram.com/examples/Bueller-Life-moves-pretty-fast.wav"
-
     # # print(output)
     # subtitle_data = output['results']['channels'][0]['alternatives'][0]['words']
     # filename = os.path.basename(mp3url)
@@ -391,38 +427,6 @@ def main():
     # for start, end in segments:
     #     print(f"Сегмент: {start} - {end} (Длительность: {end - start} сэмплов)")
 
-    # audio_chunk = AudioSegment.from_file("out.wav")
-    # audio_chunk = audio_chunk.set_sample_width(2).set_channels(1).set_frame_rate(16000)
-    # fs = 16000
-    # librosa_fs = 22050
-    # top_db = 20
-    # arr = to_normalized_array(audio_chunk, fs, librosa_fs)
-    # edges = librosa.effects.split(arr, top_db=top_db) / librosa_fs
-    # print(edges)
-
-    # audio_file_path = 'out.wav'
-    # y, sr = librosa.load(audio_file_path)
-    # print(f"Частота дискретизации: {sr} Гц")
-
-
-    # audio_path = 'out.wav'
-    # audio_signal, sampling_rate = librosa.load(audio_path)
-    # normalized_audio = librosa.effects.preemphasis(audio_signal)
-    # speed_changed_audio = librosa.effects.time_stretch(normalized_audio, rate=1.5)
-    # # plt.figure(figsize=(12, 8))
-    # # plt.subplot(2, 1, 1)
-    # # librosa.display.waveshow(normalized_audio, sr=sampling_rate)
-    # # plt.title('Исходный аудио сигнал')
-    # # plt.subplot(2, 1, 2)
-    # # librosa.display.waveshow(speed_changed_audio, sr=sampling_rate)
-    # # plt.title('Аудио с измененной скоростью')
-    # # plt.tight_layout()
-    # # plt.show()
-    # threshold = 0.05
-    # min_segment_length = 1000
-    # segments = segment_audio_by_threshold(speed_changed_audio, threshold, min_segment_length)
-    # for start, end in segments:
-    #     print(f"Сегмент: {start} - {end} (Длительность: {end - start} сэмплов)")
 
     # data_array = [
     #     [0.16253968, 0.60371882],
@@ -445,17 +449,22 @@ def main():
     # for i, time in enumerate(formatted_times, start=1):
     #     print("Segment {}: {}".format(i, time))
 
-    value = 57.70902494
+    # value = 57.70902494
+    # seconds, microseconds = divmod(int(value * 1e6), 1e6)
+    # hours, remainder = divmod(seconds, 3600)
+    # minutes, seconds = divmod(remainder, 60)
+    # formatted_time = "{:02d}:{:02d}:{:02d},{:06d}".format(
+    #     int(hours), int(minutes), int(seconds), int(microseconds)
+    # )
+    # print("Formatted time: {}".format(formatted_time))
 
-    seconds, microseconds = divmod(int(value * 1e6), 1e6)
-    hours, remainder = divmod(seconds, 3600)
-    minutes, seconds = divmod(remainder, 60)
+    # Пример использования
+    audio_file_path = 'final.wav'
+    segments = detect_audio_segments(audio_file_path)
 
-    formatted_time = "{:02d}:{:02d}:{:02d},{:06d}".format(
-        int(hours), int(minutes), int(seconds), int(microseconds)
-    )
-
-    print("Formatted time: {}".format(formatted_time))
+    print("Отрезки с звуком:")
+    for segment in segments:
+        print(f"Начало: {segment[0]}, Конец: {segment[1]}")
 
 
 
