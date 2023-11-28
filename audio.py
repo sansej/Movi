@@ -1,4 +1,5 @@
 from elevenlabs import generate, save, set_api_key
+from subtitle import SubtitleEditor
 import os
 import numpy
 from pydub import AudioSegment
@@ -7,10 +8,10 @@ set_api_key(os.environ.get("ELEVEN_KEY"))
 
 class AudioEditor:
 
-    def create_voice(self, voice="Fin", output_file = 'out.wav', text=''):
+    def create_voice(self, output_file, text):
         audio = generate(
         text=text,
-        voice = voice,
+        voice = "Fin",
         model="eleven_multilingual_v2"
         )
         save(audio, output_file)
@@ -20,7 +21,16 @@ class AudioEditor:
         so = sound.speedup(playback_speed = speed)
         so.export(output_path, format = format)
 
-    def detect_segments(self, audio_file_path, silence_threshold=-40, min_silence_duration=1000):
+    def to_subtitle_file(audio_file_path, subtitle_file, text):
+        segments = detect_segments(audio_file_path)
+        result = SubtitleEditor.split_text(text, len(segments))
+        with open(subtitle_file, 'w', encoding='UTF-8') as f:
+            for i, (segment, part_text) in enumerate(zip(segments, result), start=1):
+                f.write(f"{i}\n")
+                f.write(f"{segment[0]} --> {segment[1]}\n")
+                f.write(f"{part_text}\n\n")
+
+def detect_segments(audio_file_path, silence_threshold=-40, min_silence_duration=1000):
         audio = AudioSegment.from_file(audio_file_path)
         audio_array = numpy.array(audio.get_array_of_samples())
         sound_segments = []
@@ -39,12 +49,12 @@ class AudioEditor:
                     if duration > min_silence_duration:
                         start_time_sec = start_time / audio.frame_rate
                         end_time_sec = end_time / audio.frame_rate
-                        start_time_formatted = self.format_seconds(start_time_sec)
-                        end_time_formatted = self.format_seconds(end_time_sec)
+                        start_time_formatted = format_seconds(start_time_sec)
+                        end_time_formatted = format_seconds(end_time_sec)
                         sound_segments.append((start_time_formatted, end_time_formatted))
         return sound_segments
 
-    def format_seconds(self,seconds):
+def format_seconds(seconds):
         hours, remainder = divmod(seconds, 3600)
         minutes, seconds = divmod(remainder, 60)
         microseconds = int((seconds % 1) * 1e6)
