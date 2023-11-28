@@ -22,6 +22,16 @@ class AudioEditor:
         so.export(output_path, format = format)
 
     def to_subtitle_file(audio_file_path, subtitle_file, text):
+        """
+        creates subtitles from an audio file
+
+        audio_file_path - path to audio file ``*.MP3`` ``*.WAV``
+
+        subtitle_file - sub file path ``*.SRT``
+
+        text
+        """
+        srt = []
         segments = detect_segments(audio_file_path)
         result = SubtitleEditor.split_text(text, len(segments))
         with open(subtitle_file, 'w', encoding='UTF-8') as f:
@@ -29,8 +39,17 @@ class AudioEditor:
                 f.write(f"{i}\n")
                 f.write(f"{segment[0]} --> {segment[1]}\n")
                 f.write(f"{part_text}\n\n")
+                srt.append((segment[0], segment[1], part_text))
+        return srt
 
 def detect_segments(audio_file_path, silence_threshold=-40, min_silence_duration=1000):
+        '''
+        audio_file_path - path to audio file ``*.MP3`` ``*.WAV``
+
+        silence_threshold - silence threshold, default ``40dB``
+
+        min_silence_duration - minimum silence duration, default ``1000mcs``
+        '''
         audio = AudioSegment.from_file(audio_file_path)
         audio_array = numpy.array(audio.get_array_of_samples())
         sound_segments = []

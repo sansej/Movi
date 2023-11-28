@@ -16,6 +16,7 @@
 # import unicodedata
 # import math
 from audio import AudioEditor
+from subtitle import SubtitleEditor
 # import matplotlib.pyplot as plt
 # import librosa
 # import requests
@@ -28,66 +29,10 @@ from audio import AudioEditor
 import numpy
 # import imageio
 # from elevenlabs import generate, save, set_api_key
-# import moviepy.editor as mp
+import moviepy.editor as mp
 # from pydub import AudioSegment
-# import pysrt
+import pysrt
 # from moviepy.editor import VideoFileClip, TextClip, CompositeVideoClip
-
-
-# def segment_audio_by_threshold(audio_signal, threshold=0.05, min_segment_length=1000):
-#     """
-#     Сегментация аудиосигнала на отдельные сегменты на основе пороговой обработки.
-    
-#     Параметры:
-#     - audio_signal: массив значений аудиосигнала
-#     - threshold: пороговое значение для определения паузы
-#     - min_segment_length: минимальная длина сегмента, чтобы исключить короткие шумовые периоды
-    
-#     Возвращает:
-#     - segments: список кортежей, представляющих сегменты (начальный индекс, конечный индекс)
-#     """
-#     above_threshold = audio_signal > threshold
-#     segment_starts = numpy.where(numpy.diff(above_threshold.astype(int)) == 1)[0]
-#     segment_ends = numpy.where(numpy.diff(above_threshold.astype(int)) == -1)[0]
-
-#     # Удаление коротких сегментов
-#     valid_segments = [(start, end) for start, end in zip(segment_starts, segment_ends) if end - start > min_segment_length]
-
-#     return valid_segments
-
-# def to_normalized_array(audio_chunk, fs, librosa_fs):
-#    samples = audio_chunk.get_array_of_samples()
-#    arr = numpy.array(samples).astype(numpy.float32) / numpy.iinfo(numpy.int16).max
-#    return librosa.core.resample(arr, fs, librosa_fs)
-
-def segment_audio_by_threshold(audio_signal, threshold=0.05, min_segment_length=1000):
-    above_threshold = audio_signal > threshold
-    segment_starts = numpy.where(numpy.diff(above_threshold.astype(int)) == 1)[0]
-    segment_ends = numpy.where(numpy.diff(above_threshold.astype(int)) == -1)[0]
-
-    # Удаление коротких сегментов
-    valid_segments = [(start, end) for start, end in zip(segment_starts, segment_ends) if end - start > min_segment_length]
-
-    return valid_segments
-
-def srt_format_time(segment):
-    start_time = int(segment[0])
-    end_time = int(segment[1])
-
-    start_hours, start_remainder = divmod(start_time, 3600)
-    start_minutes, start_seconds = divmod(start_remainder, 60)
-    start_seconds, start_microseconds = divmod(int((start_seconds - int(start_seconds)) * 1e6), 1e6)
-
-    end_hours, end_remainder = divmod(end_time, 3600)
-    end_minutes, end_seconds = divmod(end_remainder, 60)
-    end_seconds, end_microseconds = divmod(int((end_seconds - int(end_seconds)) * 1e6), 1e6)
-
-    formatted_time = "{:02d}:{:02d}:{:02d},{:06d} - {:02d}:{:02d}:{:02d},{:06d}".format(
-        start_hours, start_minutes, int(start_seconds), int(start_microseconds),
-        end_hours, end_minutes, int(end_seconds), int(end_microseconds)
-    )
-
-    return formatted_time
 
 def main():
     # crop_image(input_path='ntc.jpg', output_path='crop_ntc.jpg')
@@ -145,20 +90,15 @@ def main():
     #         file_name = f'{count}_tr.mp4'
     #     count += 1
 
-    # srtfilename = "sub.srt"
-    # mp4filename = "video_with_voice.mp4"
-    # video = VideoFileClip(mp4filename)
-    # subtitles = pysrt.open(srtfilename)
-    # begin,end= mp4filename.split(".mp4")
-    # output_video_file = begin+'_sub'+".mp4"
-    # print ("Output file name: ",output_video_file)
-    # subtitle_clips = create_subtitle_clips(subtitles,video.size)
-    # final_video = CompositeVideoClip([video] + subtitle_clips)
-    # final_video.write_videofile(output_video_file)
 
-    AudioEditor.to_subtitle_file(audio_file_path='crop.mp3', subtitle_file='sub.srt', text=text)
-    # a = SubtitleEditor.split_text(text, 64)
-    # print(a)
+    video = mp.VideoFileClip("video\\final.mp4")
+    begin,end= "video\\video_with_voice.mp4".split(".mp4")
+    output_video_file = begin+'_sub'+".mp4"
+    print ("Output file name: ",output_video_file)
+    sub = AudioEditor.to_subtitle_file(audio_file_path='final.wav', subtitle_file='subtitles.srt', text=text)
+    sub_clip = SubtitleEditor.create_subtitle_clips(sub,video.size)
+    final_video = mp.CompositeVideoClip([video] + sub_clip)
+    final_video.write_videofile(output_video_file)
 
     
 

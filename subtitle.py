@@ -4,23 +4,27 @@ import unicodedata
 
 class SubtitleEditor:
 
-    def create_subtitle_clips(self, subtitles, videosize,fontsize=80, font='Arial', color='yellow', debug = False):
+    def create_subtitle_clips(subtitles, videosize,fontsize=80, font='Arial', color='yellow', debug = False):
+        """
+        subtitles - SubRipFile array ``[<pysrt.srtitem.SubRipItem object at 0x000001A055A88530>]``
+
+        output_path - path to modified image ``*.JPG`` ``*.PNG``
+
+        resolution - final image resolution, default ``720*1280``
+        """
         subtitle_clips = []
         change_settings({"IMAGEMAGICK_BINARY": r"C:\\Program Files\\ImageMagick-7.1.1-Q16\\magick.exe"})
         for subtitle in subtitles:
-            start_time = self.time_to_seconds(subtitle.start)
-            end_time = self.time_to_seconds(subtitle.end)
+            start_time = time_to_seconds(subtitle[0])
+            end_time = time_to_seconds(subtitle[1])
             duration = end_time - start_time
             video_width, video_height = videosize
-            text_clip = TextClip(subtitle.text, fontsize=fontsize, font=font, color=color,size=(video_width*3/4, None), method='caption').set_start(start_time).set_duration(duration)
+            text_clip = TextClip(subtitle[2], fontsize=fontsize, font=font, color=color,size=(video_width*3/4, None), method='caption').set_start(start_time).set_duration(duration)
             subtitle_x_position = 'center'
             subtitle_y_position = 'center'
             text_position = (subtitle_x_position, subtitle_y_position)                    
             subtitle_clips.append(text_clip.set_position(text_position))
         return subtitle_clips
-    
-    def time_to_seconds(self, time_obj):
-        return time_obj.hours * 3600 + time_obj.minutes * 60 + time_obj.seconds + time_obj.milliseconds / 1000
 
     def split_text(text, num_parts):
         words = text.split()
@@ -50,4 +54,10 @@ class SubtitleEditor:
         text_parts.append(word_box)
         return text_parts
     
+def time_to_seconds(time_srt):
+    time_h_m = time_srt.split(':')
+    time_s_ms = time_h_m[2].split(',')
+    return round(int(time_h_m[0]) * 3600 + int(time_h_m[1]) * 60 + int(time_s_ms[0]) + int(time_s_ms[1]) / 1000000, 3)
+
+
     
