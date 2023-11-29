@@ -122,12 +122,12 @@ def main():
 
     
 
-    text = 'Привет! Сегодня расскажу об очень интерестном и прекрасном явлении, таком как северное сияние.'
-    audio_file = "out.wav"
-    video_clips_tuple = ("out.mp4", "out1.mp4", "out2.mp4")
-    print([VideoFileClip(file) for file in video_clips_tuple])
-    video = "output_video_file.mp4"
-    final_video = "final_video.mp4"
+    # text = 'Привет! Сегодня расскажу об очень интерестном и прекрасном явлении, таком как северное сияние.'
+    audio_file = "final.wav"
+    video_clips_tuple = ("video\\1.mp4", "video\\2.mp4", "video\\3.mp4")
+    # print([VideoFileClip(file) for file in video_clips_tuple])
+    video = "video\\output_video_file.mp4"
+    final_video = "video\\final_video.mp4"
     video_clips = [VideoFileClip(file) for file in video_clips_tuple]
 
 
