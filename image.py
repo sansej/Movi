@@ -9,6 +9,8 @@ class ImageEditor:
 
     def crop_image(self, input_path, output_path, resolution = (720, 1280)):
         """
+        Parameters
+        -----------
         input_path - path to source image ``*.JPG`` ``*.PNG``
 
         output_path - path to modified image ``*.JPG`` ``*.PNG``
@@ -29,6 +31,8 @@ class ImageEditor:
     
     def ken_burns_effect_video(self, image_path, output_path, duration=10, zoom_factor=1.4, reverse=False, fps=30):
         """
+        Parameters
+        -----------
         image_path - path to source image ``*.JPG`` ``*.PNG``
 
         output_path - path to the created video file ``*.MP4``

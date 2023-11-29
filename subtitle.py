@@ -4,8 +4,10 @@ import unicodedata
 
 class SubtitleEditor:
 
-    def create_subtitle_clips(subtitles, videosize,fontsize=80, font='Arial', color='yellow', debug = False):
+    def create_subtitle_clips(subtitles, videosize,fontsize=80, font='Arial', color='white', background = 'transparent', stroke_color= None, debug = False):
         """
+        Parameters
+        -----------
         subtitles - SubRipFile array ``[<pysrt.srtitem.SubRipItem object at 0x000001A055A88530>]``
 
         output_path - path to modified image ``*.JPG`` ``*.PNG``
@@ -19,7 +21,7 @@ class SubtitleEditor:
             end_time = time_to_seconds(subtitle[1])
             duration = end_time - start_time
             video_width, video_height = videosize
-            text_clip = TextClip(subtitle[2], fontsize=fontsize, font=font, color=color,size=(video_width*3/4, None), method='caption').set_start(start_time).set_duration(duration)
+            text_clip = TextClip(subtitle[2], fontsize=fontsize, font=font, color=color, bg_color=background, stroke_color=stroke_color, size=(video_width*3/4, None), method='caption').set_start(start_time).set_duration(duration)
             subtitle_x_position = 'center'
             subtitle_y_position = 'center'
             text_position = (subtitle_x_position, subtitle_y_position)                    
@@ -27,6 +29,13 @@ class SubtitleEditor:
         return subtitle_clips
 
     def split_text(text, num_parts):
+        """
+        Parameters
+        -----------
+        text - text string
+
+        num_parts - number of text parts
+        """
         words = text.split()
         total_chars = len(text.replace(" ", ""))
         chars_per_part = round(total_chars / num_parts)
@@ -55,6 +64,9 @@ class SubtitleEditor:
         return text_parts
     
 def time_to_seconds(time_srt):
+    """
+    time_srt - format ``00:00:00,000``
+    """
     time_h_m = time_srt.split(':')
     time_s_ms = time_h_m[2].split(',')
     return round(int(time_h_m[0]) * 3600 + int(time_h_m[1]) * 60 + int(time_s_ms[0]) + int(time_s_ms[1]) / 1000000, 3)

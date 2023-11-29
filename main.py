@@ -17,6 +17,7 @@
 # import math
 from audio import AudioEditor
 from subtitle import SubtitleEditor
+from video import VideoEditor
 # import matplotlib.pyplot as plt
 # import librosa
 # import requests
@@ -32,7 +33,8 @@ import numpy
 import moviepy.editor as mp
 # from pydub import AudioSegment
 import pysrt
-# from moviepy.editor import VideoFileClip, TextClip, CompositeVideoClip
+from moviepy.editor import VideoFileClip, CompositeVideoClip, AudioFileClip, concatenate_videoclips
+
 
 def main():
     # crop_image(input_path='ntc.jpg', output_path='crop_ntc.jpg')
@@ -90,15 +92,54 @@ def main():
     #         file_name = f'{count}_tr.mp4'
     #     count += 1
 
+    # text = 'Привет! Сегодня расскажу об очень интерестном и прекрасном явлении, таком как северное сияние.'
+    # VideoEditor.combinate(video_path="output_video.mp4", audio_path='crop.mp3', output_path= 'video_with_crop_mp3.mp4')
+    # video1 = mp.VideoFileClip("video_with_crop_mp3.mp4")
+    # sub = AudioEditor.to_subtitle(audio_file_path='crop.mp3', text=text)
+    # sub_clip = SubtitleEditor.create_subtitle_clips(sub,video1.size,fontsize=70,background='black')
+    # final_video = mp.CompositeVideoClip([video1] + sub_clip)
+    # final_video.write_videofile('output_video_file_crop_mp3.mp4')
 
-    video = mp.VideoFileClip("video\\final.mp4")
-    begin,end= "video\\video_with_voice.mp4".split(".mp4")
-    output_video_file = begin+'_sub'+".mp4"
-    print ("Output file name: ",output_video_file)
-    sub = AudioEditor.to_subtitle_file(audio_file_path='final.wav', subtitle_file='subtitles.srt', text=text)
-    sub_clip = SubtitleEditor.create_subtitle_clips(sub,video.size)
-    final_video = mp.CompositeVideoClip([video] + sub_clip)
-    final_video.write_videofile(output_video_file)
+    
+
+    # def create_composite_video(video_clips, subtitles_clip, audio_file, transition_duration=1):
+
+    #     # Загрузка аудио файла
+    #     audio = AudioFileClip(audio_file)
+
+    #     # Создание списка видео с переходами
+    #     clips_with_transitions = []
+    #     for idx, clip in enumerate(video_clips):
+    #         if idx > 0:
+    #             transition_clip = concatenate_videoclips([clips_with_transitions[-1], clip.set_start(clip.duration - transition_duration)], method="compose", crossfade=transition_duration)
+    #             clips_with_transitions[-1] = transition_clip
+    #         clips_with_transitions.append(clip)
+
+    #     # Создание CompositeVideoClip
+    #     composite_clip = CompositeVideoClip(clips_with_transitions, subtitles=subtitles_clip, audio=audio)
+
+    #     return composite_clip
+
+    
+
+    text = 'Привет! Сегодня расскажу об очень интерестном и прекрасном явлении, таком как северное сияние.'
+    audio_file = "out.wav"
+    video_clips_tuple = ("out.mp4", "out1.mp4", "out2.mp4")
+    print([VideoFileClip(file) for file in video_clips_tuple])
+    video = "output_video_file.mp4"
+    final_video = "final_video.mp4"
+    video_clips = [VideoFileClip(file) for file in video_clips_tuple]
+
+
+    sub = AudioEditor.to_subtitle(audio_file_path=audio_file, text=text)
+    sub_clip = SubtitleEditor.create_subtitle_clips(sub,video_clips[0].size,fontsize=70,background='black')
+
+    result_clip = VideoEditor.create_transition(video_clips, sub_clip)
+
+    result_clip.write_videofile(video, codec="libx264", audio_codec="aac")
+
+    VideoEditor.combinate(audio_path=audio_file,video_path=video,output_path=final_video)
+
 
     
 

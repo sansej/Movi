@@ -41,9 +41,30 @@ class AudioEditor:
                 f.write(f"{part_text}\n\n")
                 srt.append((segment[0], segment[1], part_text))
         return srt
+    
+    def to_subtitle(audio_file_path, text):
+        """
+        creates subtitles from text
+
+        audio_file_path - path to audio file ``*.MP3`` ``*.WAV``
+
+        text
+        """
+        srt = []
+
+        # audio = AudioSegment.from_file(audio_file_path)
+        # duration_in_seconds = len(audio) / 1000  # ms
+    
+        segments = divide_into_parts(audio_file_path)
+        result = SubtitleEditor.split_text(text, len(segments))
+        for (segment, part_text) in zip(segments, result):
+            srt.append((segment[0], segment[1], part_text))
+        return srt
 
 def detect_segments(audio_file_path, silence_threshold=-40, min_silence_duration=1000):
         '''
+        Parameters
+        -----------
         audio_file_path - path to audio file ``*.MP3`` ``*.WAV``
 
         silence_threshold - silence threshold, default ``40dB``
@@ -73,8 +94,36 @@ def detect_segments(audio_file_path, silence_threshold=-40, min_silence_duration
                         sound_segments.append((start_time_formatted, end_time_formatted))
         return sound_segments
 
+def divide_into_parts(audio_file_path):
+        '''
+        Parameters
+        -----------
+        audio_file_path - path to audio file ``*.MP3`` ``*.WAV``
+
+        '''
+        audio = AudioSegment.from_file(audio_file_path)
+        duration_in_seconds = len(audio) # ms
+        num_parts = round(duration_in_seconds/2000)
+        part_duration = round(duration_in_seconds/num_parts)
+        result_array = []
+        for i in range(num_parts):
+            start_time = format_miliseconds(i * part_duration)
+            end_time = format_miliseconds((i + 1) * part_duration)
+            result_array.append((start_time, end_time))
+        return result_array
+
+    
 def format_seconds(seconds):
         hours, remainder = divmod(seconds, 3600)
         minutes, seconds = divmod(remainder, 60)
         microseconds = int((seconds % 1) * 1e6)
         return f"{int(hours):02d}:{int(minutes):02d}:{int(seconds):02d},{microseconds:06d}"
+
+def format_miliseconds(miliseconds):
+        seconds, msec = divmod(miliseconds, 1000)
+        minuts, sec = divmod(seconds, 60)
+        hours, min = divmod(minuts, 60)
+        return f"{int(hours):02d}:{int(min):02d}:{int(sec):02d},{msec:03d}"
+
+
+
