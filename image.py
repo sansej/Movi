@@ -7,7 +7,7 @@ class ImageEditor:
     Image crop and convert image to video
     """
 
-    def crop_image(self, input_path, output_path, resolution = (720, 1280)):
+    def crop_image(input_path, output_path, resolution = (720, 1280)):
         """
         Parameters
         -----------

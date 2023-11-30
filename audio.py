@@ -8,7 +8,7 @@ set_api_key(os.environ.get("ELEVEN_KEY"))
 
 class AudioEditor:
 
-    def create_voice(self, output_file, text):
+    def create_voice(output_file, text):
         audio = generate(
         text=text,
         voice = "Fin",
@@ -16,7 +16,7 @@ class AudioEditor:
         )
         save(audio, output_file)
 
-    def change_speed(self, input_path, output_path, format = 'wav', speed = 1.07):
+    def change_speed(input_path, output_path, format = 'wav', speed = 1.07):
         sound = AudioSegment.from_file(input_path)
         so = sound.speedup(playback_speed = speed)
         so.export(output_path, format = format)

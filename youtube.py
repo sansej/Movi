@@ -158,30 +158,27 @@ def resumable_upload(insert_request):
       print("Sleeping %f seconds and then retrying..." % sleep_seconds)
       time.sleep(sleep_seconds)
 
-if __name__ == '__main__':
-  argparser.add_argument("--file", required=True, help="Video file to upload")
-  argparser.add_argument("--title", help="Video title", default="Test Title")
-  argparser.add_argument("--description", help="Video description",
-    default="Test Description")
-  argparser.add_argument("--category", default="22",
-    help="Numeric video category. " +
-      "See https://developers.google.com/youtube/v3/docs/videoCategories/list")
-  argparser.add_argument("--keywords", help="Video keywords, comma separated",
-    default="")
-  argparser.add_argument("--privacyStatus", choices=VALID_PRIVACY_STATUSES,
-    default=VALID_PRIVACY_STATUSES[0], help="Video privacy status.")
+# def post_shorts(video_path, title, description, category = "28", keywords="MrSim, Science, Technology, Space", status="public"):
+def post_shorts():
+# if __name__ == "__main__":
+  argparser.add_argument("--file", required=True, help="Video file to upload"), argparser.add_argument("--title", help="Video title", default="Test Title")
+  argparser.add_argument("--description", help="Video description", default="Test Description")
+  argparser.add_argument("--category", default="22", help="Numeric video category. " + "See https://developers.google.com/youtube/v3/docs/videoCategories/list")
+  argparser.add_argument("--keywords", help="Video keywords, comma separated", default="")
+  argparser.add_argument("--privacyStatus", choices=VALID_PRIVACY_STATUSES, default=VALID_PRIVACY_STATUSES[0], help="Video privacy status.")
   args = argparser.parse_args()
-
   if not os.path.exists(args.file):
     exit("Please specify a valid file using the --file= parameter.")
-
+  print(args)
   youtube = get_authenticated_service(args)
   try:
     initialize_upload(youtube, args)
   except HttpError as e:
     print("An HTTP error %d occurred:\n%s" % (e.resp.status, e.content))
 
-# python3 youtube.py --file="example.mov" --title="Summer vacation in California" --description="Had fun surfing in Santa Cruz" --keywords="surfing,Santa Cruz" --category="27" --privacyStatus="public"
+# args = Namespace(auth_host_name='localhost', noauth_local_webserver=False, auth_host_port=[8080, 8090], logging_level='ERROR', file='video\\\\final_video.mp4', title='Интресные факты. Сатурн', description='несколько интересных фактов о планете Сатурн', category='28', keywords='MrSim, Science, Technology, Space', privacyStatus='public')
+
+# python3 main.py --file="video\\final_video.mp3" --title="Интресные факты. Сатурн" --description="несколько интересных фактов о планете Сатурн" --keywords="MrSim, Science, Technology, Space" --category="28" --privacyStatus="public"
 
 # Issue: https://stackoverflow.com/a/64695395
 # Audit Form: https://developers.google.com/youtube/v3/docs/videos/insert
@@ -189,3 +186,20 @@ if __name__ == '__main__':
 # Private (Locked)
 # List of YouTube Categories (Numeric)
 # https://techpostplus.com/youtube-video-categories-list-faqs-and-solutions/
+
+
+
+  # argparser.add_argument(video_path, required=True, help="Video file to upload")
+  # argparser.add_argument(title, help="Video title", default="Test Title")
+  # argparser.add_argument(description, help="Video description", default="Test Description")
+  # argparser.add_argument(category, default="22", help="Numeric video category. " + "See https://developers.google.com/youtube/v3/docs/videoCategories/list")
+  # argparser.add_argument(keywords, help="Video keywords, comma separated", default="")
+  # argparser.add_argument(status, choices=VALID_PRIVACY_STATUSES, default=VALID_PRIVACY_STATUSES[0], help="Video privacy status.")
+  # args = argparser.parse_args()
+  # if not os.path.exists(args.file):
+  #   exit("Please specify a valid file using the --file= parameter.")
+  # youtube = get_authenticated_service(args)
+  # try:
+  #   initialize_upload(youtube, args)
+  # except HttpError as e:
+  #   print("An HTTP error %d occurred:\n%s" % (e.resp.status, e.content))

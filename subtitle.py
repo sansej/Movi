@@ -4,7 +4,7 @@ import unicodedata
 
 class SubtitleEditor:
 
-    def create_subtitle_clips(subtitles, videosize,fontsize=80, font='Arial', color='white', background = 'transparent', stroke_color= None, debug = False):
+    def create_subtitle_clips(subtitles, videosize,fontsize=80, font='Arial', color='white', background = 'transparent', stroke_color= None, stroke_width = 1, debug = False):
         """
         Parameters
         -----------
@@ -21,9 +21,9 @@ class SubtitleEditor:
             end_time = time_to_seconds(subtitle[1])
             duration = end_time - start_time
             video_width, video_height = videosize
-            text_clip = TextClip(subtitle[2], fontsize=fontsize, font=font, color=color, bg_color=background, stroke_color=stroke_color, size=(video_width*3/4, None), method='caption').set_start(start_time).set_duration(duration)
+            text_clip = TextClip(subtitle[2], fontsize=fontsize, font=font, color=color, bg_color=background, stroke_color=stroke_color, stroke_width=stroke_width,size=(video_width*3/4, None), method='caption').set_start(start_time).set_duration(duration)
             subtitle_x_position = 'center'
-            subtitle_y_position = 'center'
+            subtitle_y_position = 'bottom'
             text_position = (subtitle_x_position, subtitle_y_position)                    
             subtitle_clips.append(text_clip.set_position(text_position))
         return subtitle_clips

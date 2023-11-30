@@ -5,4 +5,4 @@
 *.wav
 .env
 *.srt
-client_secrets.json
+*.json
