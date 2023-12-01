@@ -5,26 +5,20 @@ from image import ImageEditor
 from youtube import post_shorts
 import os 
 from moviepy.editor import VideoFileClip
+import pyttsx3
+from pydub import AudioSegment
 
 def create_shorts():
         count = 1
         folder_image = 'image'
         folter_image_crop = 'image_crop'
         folder_video = 'video'
-        voice = 'crop.mp3'
-        audio_file = 'voice.mp3'
+        voice = 'audio\\crop.mp3'
+        audio_file = 'audio\\voice.mp3'
         video_sound = 'video\\video_sound.mp4'
 
-        text = '''Юпи́тер – самая крупная планета в Солнечной системе. Её масса в 318 раз больше массы Земли,
-        а объем в 1300 раз больше. Если бы Юпи́тер был ещё чуть-чуть массивнее, он мог бы стать звездой,
-        так как в его ядре происходит процесс термоядерного синтеза, подобный тому, что происходит в звёздах.
-        На Юпи́тере есть впечатляющее магнитное поле, превосходящее магнитное поле любой другой планеты
-        в Солнечной системе. Это поле создает мощные радиальные лучи, наблюдаемые в районе полюсов. Эти
-        светящиеся лучи делают Юпи́тер еще более удивительным объектом для наблюдения. У Юпи́тера более 80
-        известных спутников. Самый известный из них – Ганимед, самый крупный спутник в Солнечной системе.
-        Ещё один известный спутник Юпи́тера – Ио – известен своими вулканическими извержениями и
-        ярко-красными пя́тнами на поверхности.'''
-
+        text = """ Темные стороны Луны: Луна всегда обращена к Земле одной и той же стороной из-за синхронного вращения. Её обратная сторона оставалась тайной до момента, когда космические миссии стали исследовать её. Эта загадочная область отличается от видимой стороны по ландшафту и геологии. Лунные трясины: Во время миссий Apollo астронавты заметили необычное явление — лунные трясины. После того как они выпустили модуль на поверхность, Луна "зазвучала" подобно колокольчику. Эти грунтовые волны указывают на наличие подпольных пустот или слоев, делая Луну более загадочной, чем предполагалось. Лунные вулканы: На Луне есть следы деятельности вулканов. Самый высокий вулкан, Олимп, возвышается на 21 километр, превосходя высоту любой вулканической горы на Земле."""
+    
         # try:
         #     AudioEditor.create_voice(text=text,output_file=voice)
         # except:
@@ -42,17 +36,17 @@ def create_shorts():
         # except:
         #     exit('Error: Failed to crop image')
 
-        # try:
-        #     count = 1
-        #     for file in os.listdir(folter_image_crop):
-        #         if count%3!=0:
-        #             rev = False
-        #         else:
-        #             rev = True
-        #         ImageEditor.ken_burns_effect_video(image_path=f'{folter_image_crop}\\{file}', output_path=f'{folder_video}\\{count}.mp4', duration=7, reverse=rev)
-        #         count += 1
-        # except:
-        #     exit('Error: Failed to create video')
+        try:
+            count = 1
+            for file in os.listdir(folter_image_crop):
+                if count%3!=0:
+                    rev = False
+                else:
+                    rev = True
+                ImageEditor.ken_burns_effect_video(image_path=f'{folter_image_crop}\\{file}', output_path=f'{folder_video}\\{count}.mp4', duration=7, reverse=rev)
+                count += 1
+        except:
+            exit('Error: Failed to create video')
 
         try:
             if os.path.exists('video\\12.mp4'):
@@ -196,13 +190,21 @@ def create_shorts():
 
 
 def main():
-    # create_shorts()
-#     # post_shorts(video_path="video\\final_video.mp4",title="Интресные факты. Сатурн",description="несколько интересных фактов о планете Сатурн")
-#     post_shorts()
-    s  = VideoFileClip('video\\final_video.mp4').duration
-    # a  = VideoFileClip('video\\final_video_crop.mp4').duration
-    d  = AudioFileClip('voice.mp3').duration
-    print(s,d)
+    create_shorts()
+
+
+
+    # audio = AudioSegment.from_file("test.mp3")
+    # current_duration = len(audio)/1000 # в секундах
+    # print(current_duration)
+    # target_duration = 60
+    # speed_ratio = current_duration / target_duration
+    # print(speed_ratio)
+    # adjusted_audio = audio.speedup(playback_speed=speed_ratio+0.01)
+    # adjusted_audio.export("test_out.mp3", format="mp3")
+
+    # cu_duration = len(AudioSegment.from_file("test_out.mp3")) / 1000  # в секундах
+    # print(cu_duration)
 
 
 if __name__ == "__main__":

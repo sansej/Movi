@@ -29,7 +29,7 @@ class ImageEditor:
         else:
             print(f"Image resolution ({original_image.width}x{original_image.height}) is less than {target_width}x{target_height}.")
     
-    def ken_burns_effect_video(self, image_path, output_path, duration=10, zoom_factor=1.4, reverse=False, fps=30):
+    def ken_burns_effect_video(image_path, output_path, duration=10, zoom_factor=1.4, reverse=False, fps=30):
         """
         Parameters
         -----------
