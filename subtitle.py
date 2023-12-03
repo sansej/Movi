@@ -4,7 +4,7 @@ import unicodedata
 
 class SubtitleEditor:
 
-    def create_subtitle_clips(subtitles, videosize,fontsize=80, font='Arial', color='white', background = 'transparent', stroke_color= None, stroke_width = 1, debug = False):
+    def create_subtitle_clips(subtitles, videosize,fontsize=80, xy_pos=('center',800),font='Arial', color='white', background = 'transparent', stroke_color= None, stroke_width = 1, debug = False):
         """
         Parameters
         -----------
@@ -22,8 +22,8 @@ class SubtitleEditor:
             duration = end_time - start_time
             video_width, video_height = videosize
             text_clip = TextClip(subtitle[2], fontsize=fontsize, font=font, color=color, bg_color=background, stroke_color=stroke_color, stroke_width=stroke_width,size=(video_width*3/4, None), method='caption').set_start(start_time).set_duration(duration)
-            subtitle_x_position = 'center'
-            subtitle_y_position = 'bottom'
+            subtitle_x_position = xy_pos[0]
+            subtitle_y_position = xy_pos[1]
             text_position = (subtitle_x_position, subtitle_y_position)                    
             subtitle_clips.append(text_clip.set_position(text_position))
         return subtitle_clips
@@ -71,5 +71,11 @@ def time_to_seconds(time_srt):
     time_s_ms = time_h_m[2].split(',')
     return round(int(time_h_m[0]) * 3600 + int(time_h_m[1]) * 60 + int(time_s_ms[0]) + int(time_s_ms[1]) / 1000000, 3)
 
-
+def len_simbols(file_path):
+    total_chars = 0
+    with open(file_path, 'r', encoding='UTF-8') as file:
+        text = file.read()
+        total_chars = len(text.replace(" ", ""))
+        file.close()
+    return total_chars
     
