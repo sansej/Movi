@@ -1,6 +1,9 @@
 import imageio 
 from PIL import Image
 import numpy
+import requests
+from io import BytesIO
+import os
 
 class ImageEditor:
     """
@@ -75,3 +78,30 @@ class ImageEditor:
                 frame_array = numpy.array(frame)
                 writer.append_data(frame_array)
         print(f'{output_path} video file created')
+
+    def get_pexels_images(save_path, api_key, query = "Snow", per_page=2):
+        base_url = "https://api.pexels.com/v1/search"
+        headers = {"Authorization": api_key}
+        params = {"query": query, "per_page": per_page}
+
+        response = requests.get(base_url, headers=headers, params=params)
+
+        if response.status_code == 200:
+            data = response.json()
+            photos = data.get("photos", [])
+
+            for index, photo in enumerate(photos, start=1):
+                photo_url = photo.get("src", {}).get("original")
+                image_data = requests.get(photo_url).content
+
+                image = Image.open(BytesIO(image_data))
+                image.save(f"{save_path}/image_{index}.jpg")
+
+                print(f"Image {index} saved successfully")
+
+        else:
+            print(f"Failed to retrieve images. Status code: {response.status_code}")
+        os.makedirs(save_path, exist_ok=True)
+
+
+

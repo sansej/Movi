@@ -12,6 +12,7 @@ import wave
 import numpy as np
 import time
 from PIL import Image
+key = 'MVsaiNhymA81LvKqS9oezJeEpyZ2pYDtq9zFFQvnuWPwCMPmhiOLaI88'
 
 CLIP_NAME = 'Snow'
 
@@ -22,6 +23,7 @@ def create_shorts_ru():
         folter_image_crop = f'image_crop\\{CLIP_NAME}'
         folter_image_resize = f'image_resize\\{CLIP_NAME}'
         folder_video = f'video\\{CLIP_NAME}'
+        folder_final = f'final\\{CLIP_NAME}'
         voice = f'audio\\sound_{CLIP_NAME}.mp3'
         audio_file = f'audio\\voice_{CLIP_NAME}_ru.mp3'
         video_sound = f'video\\{CLIP_NAME}\\video_sound_{CLIP_NAME}.mp4'
@@ -64,16 +66,14 @@ def create_shorts_ru():
                 if any(fnmatch.fnmatch(file, img) for img in image_list):
                     try:
                         file_name = file.split('.')
-                        ImageEditor.resize(input_path=f'{folder_image}\\{file}', output_path=f'{folter_image_resize}\\{file_name[0]}_{CLIP_NAME}.{file_name[1]}')
+                        ImageEditor.resize(input_path=f'{folder_image}\\{file}', output_path=f'{folter_image_resize}\\{file_name[0]}.{file_name[1]}')
                         print(f'{file} resize')
-                        ImageEditor.crop_image(input_path=f'{folter_image_resize}\\{file_name[0]}_{CLIP_NAME}.{file_name[1]}', output_path=f'{folter_image_crop}\\{file_name[0]}_{CLIP_NAME}.{file_name[1]}')
+                        ImageEditor.crop_image(input_path=f'{folter_image_resize}\\{file_name[0]}.{file_name[1]}', output_path=f'{folter_image_crop}\\{file_name[0]}.{file_name[1]}')
                         print(f'{file} crop')
-                        os.rename(f'{folder_image}\\{file}', f'{folder_image}\\{file_name[0]}_{CLIP_NAME}.{file_name[1]}')
-                        print(f'The file was successfully renamed from {file} to {file_name[0]}_{CLIP_NAME}.{file_name[1]}')
                     except FileNotFoundError:
                         print(f'{file} not found')
                     except FileExistsError:
-                        print(f'{file_name[0]}_{CLIP_NAME}.{file_name[1]} already exists')
+                        print(f'{file_name[0]}.{file_name[1]} already exists')
                     except Exception as e:
                         print(f'Error: {e}')
         except:
@@ -85,199 +85,256 @@ def create_shorts_ru():
         else:
             print(f"Folder {folder_video} already exists")
 
-        try:
-            count = 1
-            for file in os.listdir(folter_image_crop):
-                if file.endswith(f"_{CLIP_NAME}.jpg"):
-                    file_name = file.split('.')
-                    if count%3!=0:
-                        rev = False
-                    else:
-                        rev = True
-                    ImageEditor.ken_burns_effect_video(image_path=f'{folter_image_crop}\\{file}', output_path=f'{folder_video}\\{file_name[0]}.mp4', duration=5, reverse=rev)
-                    count += 1
-        except:
-            exit('Error: Failed to create video')
+        # try:
+        #     count = 1
+        #     for file in os.listdir(folter_image_crop):
+        #         if file.endswith(f".jpg"):
+        #             file_name = file.split('.')
+        #             if count%3!=0:
+        #                 rev = False
+        #             else:
+        #                 rev = True
+        #             ImageEditor.ken_burns_effect_video(image_path=f'{folter_image_crop}\\{file}', output_path=f'{folder_video}\\{file_name[0]}.mp4', duration=5, reverse=rev)
+        #             count += 1
+        # except:
+        #     exit('Error: Failed to create video')
 
-        try:
-            if os.path.exists(f'{folder_video}\\12_{CLIP_NAME}.mp4'):
-                print(f"File 12_{CLIP_NAME}.mp4 found in the folder.")
+        if not os.path.exists(folder_final):
+            os.makedirs(folder_final)
+            print(f"Folder {folder_final} created")
+        else:
+            print(f"Folder {folder_final} already exists")
+
+        # -------------------------------------------------------------------- CREATE VIDEO -----------------------------------------------------------------------------
+        current_file = ''
+        for i in range(1,15):
+            file = f"{i}.mp4"
+            if i%2!=0:
+                current_file = file
             else:
-                clip1 = VideoFileClip(f"{folder_video}\\1_{CLIP_NAME}.mp4")
-                clip2 = VideoFileClip(f"{folder_video}\\2_{CLIP_NAME}.mp4")
+                a = current_file.split('.')
+                b = file.split('.')
+                clip1 = VideoFileClip(f"{folder_video}\\{current_file}")
+                clip2 = VideoFileClip(f"{folder_video}\\{file}")
                 result_clip = VideoEditor.create_transition([clip1, clip2],overlap=0.5)
-                result_clip.write_videofile(f"{folder_video}\\12_{CLIP_NAME}.mp4", codec="libx264", audio_codec=None)
+                result_clip.write_videofile(f"{folder_final}\\{a[0]}-{b[0]}.mp4", codec="libx264", audio_codec=None)
                 clip1.close()
                 clip2.close()
                 result_clip.close()
-        except:
-            exit('Error: Failed to create video 12')
-        try:
-            if os.path.exists(f'{folder_video}\\34_{CLIP_NAME}.mp4'):
-                print(f"File 34_{CLIP_NAME}.mp4 found in the folder.")
+
+        for i,item in enumerate(['1-2','3-4','5-6','7-8','9-10','11-12','13-14']):
+            file = f'{item}.mp4'
+            if i==0:
+                current_file = file
             else:
-                clip1 = VideoFileClip(f"{folder_video}\\3_{CLIP_NAME}.mp4")
-                clip2 = VideoFileClip(f"{folder_video}\\4_{CLIP_NAME}.mp4")
+                a = current_file.split('-')
+                b = file.split('.')[0].split('-')
+                clip1 = VideoFileClip(f"{folder_final}\\{current_file}")
+                clip2 = VideoFileClip(f"{folder_final}\\{file}")
                 result_clip = VideoEditor.create_transition([clip1, clip2],overlap=0.5)
-                result_clip.write_videofile(f"{folder_video}\\34_{CLIP_NAME}.mp4", codec="libx264", audio_codec=None)
+                result_clip.write_videofile(f"{folder_final}\\{a[0]}-{b[1]}.mp4", codec="libx264", audio_codec=None)
+                current_file = f'{a[0]}-{b[1]}.mp4'
                 clip1.close()
                 clip2.close()
                 result_clip.close()
-        except:
-            exit('Error: Failed to create video 34')
-        try:
-            if os.path.exists(f'{folder_video}\\56_{CLIP_NAME}.mp4'):
-                print(f"File 56_{CLIP_NAME}.mp4 found in the folder.")
-            else:
-                clip1 = VideoFileClip(f"{folder_video}\\5_{CLIP_NAME}.mp4")
-                clip2 = VideoFileClip(f"{folder_video}\\6_{CLIP_NAME}.mp4")
-                result_clip = VideoEditor.create_transition([clip1, clip2],overlap=0.5)
-                result_clip.write_videofile(f"{folder_video}\\56_{CLIP_NAME}.mp4", codec="libx264", audio_codec=None)
-                clip1.close()
-                clip2.close()
-                result_clip.close()
-        except:
-            exit('Error: Failed to create video 56')
-        try:
-            if os.path.exists(f'{folder_video}\\78_{CLIP_NAME}.mp4'):
-                print(f"File 78_{CLIP_NAME}.mp4 found in the folder.")
-            else:
-                clip1 = VideoFileClip(f"{folder_video}\\7_{CLIP_NAME}.mp4")
-                clip2 = VideoFileClip(f"{folder_video}\\8_{CLIP_NAME}.mp4")
-                result_clip = VideoEditor.create_transition([clip1, clip2],overlap=0.5)
-                result_clip.write_videofile(f"{folder_video}\\78_{CLIP_NAME}.mp4", codec="libx264", audio_codec=None)
-                clip1.close()
-                clip2.close()
-                result_clip.close()
-        except:
-            exit('Error: Failed to create video 78')
+
+        # for i in range(1,15):
+        #     file = f"{i}.mp4"
+        #     if i==1:
+        #         current_file = file
+        #     else:
+        #         clip1 = VideoFileClip(f"{folder_video}\\{current_file}")
+        #         clip2 = VideoFileClip(f"{folder_video}\\{file}")
+        #         result_clip = VideoEditor.create_transition([clip1, clip2],overlap=0.5)
+        #         result_clip.write_videofile(f"{folder_video}\\1-{i}.mp4", codec="libx264", audio_codec=None)
+        #         current_file = f'1-{i}.mp4'
+        #         clip1.close()
+        #         clip2.close()
+        #         result_clip.close()
+
+
+
+        # try:
+        #     if os.path.exists(f'{folder_video}\\12_{CLIP_NAME}.mp4'):
+        #         print(f"File 12_{CLIP_NAME}.mp4 found in the folder.")
+        #     else:
+        #         clip1 = VideoFileClip(f"{folder_video}\\1_{CLIP_NAME}.mp4")
+        #         clip2 = VideoFileClip(f"{folder_video}\\2_{CLIP_NAME}.mp4")
+        #         result_clip = VideoEditor.create_transition([clip1, clip2],overlap=0.5)
+        #         result_clip.write_videofile(f"{folder_video}\\12_{CLIP_NAME}.mp4", codec="libx264", audio_codec=None)
+        #         clip1.close()
+        #         clip2.close()
+        #         result_clip.close()
+        # except:
+        #     exit('Error: Failed to create video 12')
+        # try:
+        #     if os.path.exists(f'{folder_video}\\34_{CLIP_NAME}.mp4'):
+        #         print(f"File 34_{CLIP_NAME}.mp4 found in the folder.")
+        #     else:
+        #         clip1 = VideoFileClip(f"{folder_video}\\3_{CLIP_NAME}.mp4")
+        #         clip2 = VideoFileClip(f"{folder_video}\\4_{CLIP_NAME}.mp4")
+        #         result_clip = VideoEditor.create_transition([clip1, clip2],overlap=0.5)
+        #         result_clip.write_videofile(f"{folder_video}\\34_{CLIP_NAME}.mp4", codec="libx264", audio_codec=None)
+        #         clip1.close()
+        #         clip2.close()
+        #         result_clip.close()
+        # except:
+        #     exit('Error: Failed to create video 34')
+        # try:
+        #     if os.path.exists(f'{folder_video}\\56_{CLIP_NAME}.mp4'):
+        #         print(f"File 56_{CLIP_NAME}.mp4 found in the folder.")
+        #     else:
+        #         clip1 = VideoFileClip(f"{folder_video}\\5_{CLIP_NAME}.mp4")
+        #         clip2 = VideoFileClip(f"{folder_video}\\6_{CLIP_NAME}.mp4")
+        #         result_clip = VideoEditor.create_transition([clip1, clip2],overlap=0.5)
+        #         result_clip.write_videofile(f"{folder_video}\\56_{CLIP_NAME}.mp4", codec="libx264", audio_codec=None)
+        #         clip1.close()
+        #         clip2.close()
+        #         result_clip.close()
+        # except:
+        #     exit('Error: Failed to create video 56')
+        # try:
+        #     if os.path.exists(f'{folder_video}\\78_{CLIP_NAME}.mp4'):
+        #         print(f"File 78_{CLIP_NAME}.mp4 found in the folder.")
+        #     else:
+        #         clip1 = VideoFileClip(f"{folder_video}\\7_{CLIP_NAME}.mp4")
+        #         clip2 = VideoFileClip(f"{folder_video}\\8_{CLIP_NAME}.mp4")
+        #         result_clip = VideoEditor.create_transition([clip1, clip2],overlap=0.5)
+        #         result_clip.write_videofile(f"{folder_video}\\78_{CLIP_NAME}.mp4", codec="libx264", audio_codec=None)
+        #         clip1.close()
+        #         clip2.close()
+        #         result_clip.close()
+        # except:
+        #     exit('Error: Failed to create video 78')
         
-        try:
-            if os.path.exists(f'{folder_video}\\910_{CLIP_NAME}.mp4'):
-                print(f"File 910_{CLIP_NAME}.mp4 found in the folder.")
-            else:
-                clip1 = VideoFileClip(f"{folder_video}\\9_{CLIP_NAME}.mp4")
-                clip2 = VideoFileClip(f"{folder_video}\\10_{CLIP_NAME}.mp4")
-                result_clip = VideoEditor.create_transition([clip1, clip2],overlap=0.5)
-                result_clip.write_videofile(f"{folder_video}\\910_{CLIP_NAME}.mp4", codec="libx264", audio_codec=None)
-                clip1.close()
-                clip2.close()
-                result_clip.close()
-        except:
-            exit('Error: Failed to create video 910')
+        # try:
+        #     if os.path.exists(f'{folder_video}\\910_{CLIP_NAME}.mp4'):
+        #         print(f"File 910_{CLIP_NAME}.mp4 found in the folder.")
+        #     else:
+        #         clip1 = VideoFileClip(f"{folder_video}\\9_{CLIP_NAME}.mp4")
+        #         clip2 = VideoFileClip(f"{folder_video}\\10_{CLIP_NAME}.mp4")
+        #         result_clip = VideoEditor.create_transition([clip1, clip2],overlap=0.5)
+        #         result_clip.write_videofile(f"{folder_video}\\910_{CLIP_NAME}.mp4", codec="libx264", audio_codec=None)
+        #         clip1.close()
+        #         clip2.close()
+        #         result_clip.close()
+        # except:
+        #     exit('Error: Failed to create video 910')
 
-        try:
-            if os.path.exists(f'{folder_video}\\1112_{CLIP_NAME}.mp4'):
-                print(f"File 1112_{CLIP_NAME}.mp4 found in the folder.")
-            else:
-                clip1 = VideoFileClip(f"{folder_video}\\11_{CLIP_NAME}.mp4")
-                clip2 = VideoFileClip(f"{folder_video}\\12_{CLIP_NAME}.mp4")
-                result_clip = VideoEditor.create_transition([clip1, clip2],overlap=0.5)
-                result_clip.write_videofile(f"{folder_video}\\1112_{CLIP_NAME}.mp4", codec="libx264", audio_codec=None)
-                clip1.close()
-                clip2.close()
-                result_clip.close()
-        except:
-            exit('Error: Failed to create video 1112')
+        # try:
+        #     if os.path.exists(f'{folder_video}\\1112_{CLIP_NAME}.mp4'):
+        #         print(f"File 1112_{CLIP_NAME}.mp4 found in the folder.")
+        #     else:
+        #         clip1 = VideoFileClip(f"{folder_video}\\11_{CLIP_NAME}.mp4")
+        #         clip2 = VideoFileClip(f"{folder_video}\\12_{CLIP_NAME}.mp4")
+        #         result_clip = VideoEditor.create_transition([clip1, clip2],overlap=0.5)
+        #         result_clip.write_videofile(f"{folder_video}\\1112_{CLIP_NAME}.mp4", codec="libx264", audio_codec=None)
+        #         clip1.close()
+        #         clip2.close()
+        #         result_clip.close()
+        # except:
+        #     exit('Error: Failed to create video 1112')
 
-        try:
-            if os.path.exists(f'{folder_video}\\1314_{CLIP_NAME}.mp4'):
-                print(f"File 1314_{CLIP_NAME}.mp4 found in the folder.")
-            else:
-                clip1 = VideoFileClip(f"{folder_video}\\13_{CLIP_NAME}.mp4")
-                clip2 = VideoFileClip(f"{folder_video}\\14_{CLIP_NAME}.mp4")
-                result_clip = VideoEditor.create_transition([clip1, clip2],overlap=0.5)
-                result_clip.write_videofile(f"{folder_video}\\1314_{CLIP_NAME}.mp4", codec="libx264", audio_codec=None)
-                clip1.close()
-                clip2.close()
-                result_clip.close()
-        except:
-            exit('Error: Failed to create video 1314')
+        # try:
+        #     if os.path.exists(f'{folder_video}\\1314_{CLIP_NAME}.mp4'):
+        #         print(f"File 1314_{CLIP_NAME}.mp4 found in the folder.")
+        #     else:
+        #         clip1 = VideoFileClip(f"{folder_video}\\13_{CLIP_NAME}.mp4")
+        #         clip2 = VideoFileClip(f"{folder_video}\\14_{CLIP_NAME}.mp4")
+        #         result_clip = VideoEditor.create_transition([clip1, clip2],overlap=0.5)
+        #         result_clip.write_videofile(f"{folder_video}\\1314_{CLIP_NAME}.mp4", codec="libx264", audio_codec=None)
+        #         clip1.close()
+        #         clip2.close()
+        #         result_clip.close()
+        # except:
+        #     exit('Error: Failed to create video 1314')
 
-        try:
-            if os.path.exists(f'{folder_video}\\1-4_{CLIP_NAME}.mp4'):
-                print(f"File 1-4_{CLIP_NAME}.mp4 found in the folder.")
-            else:
-                clip1 = VideoFileClip(f"{folder_video}\\12_{CLIP_NAME}.mp4")
-                clip2 = VideoFileClip(f"{folder_video}\\34_{CLIP_NAME}.mp4")
-                result_clip = VideoEditor.create_transition([clip1, clip2],overlap=0.5)
-                result_clip.write_videofile(f"{folder_video}\\1-4_{CLIP_NAME}.mp4", codec="libx264", audio_codec=None)
-                clip1.close()
-                clip2.close()
-                result_clip.close()
-        except:
-            exit('Error: Failed to create video 1-4')
-        try:
-            if os.path.exists(f'{folder_video}\\5-8_{CLIP_NAME}.mp4'):
-                print(f"File 5-8_{CLIP_NAME}.mp4 found in the folder.")
-            else:
-                clip1 = VideoFileClip(f"{folder_video}\\56_{CLIP_NAME}.mp4")
-                clip2 = VideoFileClip(f"{folder_video}\\78_{CLIP_NAME}.mp4")
-                result_clip = VideoEditor.create_transition([clip1, clip2],overlap=0.5)
-                result_clip.write_videofile(f"{folder_video}\\5-8_{CLIP_NAME}.mp4", codec="libx264", audio_codec=None)
-                clip1.close()
-                clip2.close()
-                result_clip.close()
-        except:
-            exit('Error: Failed to create video 5-8')
-        try:
-            if os.path.exists(f'{folder_video}\\9-12_{CLIP_NAME}.mp4'):
-                print(f"File 9-14_{CLIP_NAME}.mp4 found in the folder.")
-            else:
-                clip1 = VideoFileClip(f"{folder_video}\\910_{CLIP_NAME}.mp4")
-                clip2 = VideoFileClip(f"{folder_video}\\1112_{CLIP_NAME}.mp4")
-                result_clip = VideoEditor.create_transition([clip1, clip2],overlap=0.5)
-                result_clip.write_videofile(f"{folder_video}\\9-12_{CLIP_NAME}.mp4", codec="libx264", audio_codec=None)
-                clip1.close()
-                clip2.close()
-                result_clip.close()
-        except:
-            exit('Error: Failed to create video 9-12')
-        try:
-            if os.path.exists(f'{folder_video}\\1-8_{CLIP_NAME}.mp4'):
-                print(f"File 1-8_{CLIP_NAME}.mp4 found in the folder.")
-            else:
-                clip1 = VideoFileClip(f"{folder_video}\\1-4_{CLIP_NAME}.mp4")
-                clip2 = VideoFileClip(f"{folder_video}\\5-8_{CLIP_NAME}.mp4")
-                result_clip = VideoEditor.create_transition([clip1, clip2],overlap=0.5)
-                result_clip.write_videofile(f"{folder_video}\\1-8_{CLIP_NAME}.mp4", codec="libx264", audio_codec=None)
-                clip1.close()
-                clip2.close()
-                result_clip.close()
-        except:
-            exit('Error: Failed to create video 1-8')
-        try:
-            if os.path.exists(f'{folder_video}\\9-14_{CLIP_NAME}.mp4'):
-                print(f"File 9-14_{CLIP_NAME}.mp4 found in the folder.")
-            else:
-                clip1 = VideoFileClip(f"{folder_video}\\9-12_{CLIP_NAME}.mp4")
-                clip2 = VideoFileClip(f"{folder_video}\\1314_{CLIP_NAME}.mp4")
-                result_clip = VideoEditor.create_transition([clip1, clip2],overlap=0.5)
-                result_clip.write_videofile(f"{folder_video}\\9-14_{CLIP_NAME}.mp4", codec="libx264", audio_codec=None)
-                clip1.close()
-                clip2.close()
-                result_clip.close()
-        except:
-            exit('Error: Failed to create video 9-14')
-        try:
-            if os.path.exists(f'{folder_video}\\1-14_{CLIP_NAME}.mp4'):
-                print(f"File 9-14_{CLIP_NAME}.mp4 found in the folder.")
-            else:
-                clip1 = VideoFileClip(f"{folder_video}\\1-8_{CLIP_NAME}.mp4")
-                clip2 = VideoFileClip(f"{folder_video}\\9-14_{CLIP_NAME}.mp4")
-                result_clip = VideoEditor.create_transition([clip1, clip2],overlap=0.5)
-                result_clip.write_videofile(f"{folder_video}\\1-14_{CLIP_NAME}.mp4", codec="libx264", audio_codec=None)
-                clip1.close()
-                clip2.close()
-                result_clip.close()
-        except:
-            exit('Error: Failed to create video 1-14')
+        # try:
+        #     if os.path.exists(f'{folder_video}\\1-4_{CLIP_NAME}.mp4'):
+        #         print(f"File 1-4_{CLIP_NAME}.mp4 found in the folder.")
+        #     else:
+        #         clip1 = VideoFileClip(f"{folder_video}\\12_{CLIP_NAME}.mp4")
+        #         clip2 = VideoFileClip(f"{folder_video}\\34_{CLIP_NAME}.mp4")
+        #         result_clip = VideoEditor.create_transition([clip1, clip2],overlap=0.5)
+        #         result_clip.write_videofile(f"{folder_video}\\1-4_{CLIP_NAME}.mp4", codec="libx264", audio_codec=None)
+        #         clip1.close()
+        #         clip2.close()
+        #         result_clip.close()
+        # except:
+        #     exit('Error: Failed to create video 1-4')
+        # try:
+        #     if os.path.exists(f'{folder_video}\\5-8_{CLIP_NAME}.mp4'):
+        #         print(f"File 5-8_{CLIP_NAME}.mp4 found in the folder.")
+        #     else:
+        #         clip1 = VideoFileClip(f"{folder_video}\\56_{CLIP_NAME}.mp4")
+        #         clip2 = VideoFileClip(f"{folder_video}\\78_{CLIP_NAME}.mp4")
+        #         result_clip = VideoEditor.create_transition([clip1, clip2],overlap=0.5)
+        #         result_clip.write_videofile(f"{folder_video}\\5-8_{CLIP_NAME}.mp4", codec="libx264", audio_codec=None)
+        #         clip1.close()
+        #         clip2.close()
+        #         result_clip.close()
+        # except:
+        #     exit('Error: Failed to create video 5-8')
+        # try:
+        #     if os.path.exists(f'{folder_video}\\9-12_{CLIP_NAME}.mp4'):
+        #         print(f"File 9-14_{CLIP_NAME}.mp4 found in the folder.")
+        #     else:
+        #         clip1 = VideoFileClip(f"{folder_video}\\910_{CLIP_NAME}.mp4")
+        #         clip2 = VideoFileClip(f"{folder_video}\\1112_{CLIP_NAME}.mp4")
+        #         result_clip = VideoEditor.create_transition([clip1, clip2],overlap=0.5)
+        #         result_clip.write_videofile(f"{folder_video}\\9-12_{CLIP_NAME}.mp4", codec="libx264", audio_codec=None)
+        #         clip1.close()
+        #         clip2.close()
+        #         result_clip.close()
+        # except:
+        #     exit('Error: Failed to create video 9-12')
+        # try:
+        #     if os.path.exists(f'{folder_video}\\1-8_{CLIP_NAME}.mp4'):
+        #         print(f"File 1-8_{CLIP_NAME}.mp4 found in the folder.")
+        #     else:
+        #         clip1 = VideoFileClip(f"{folder_video}\\1-4_{CLIP_NAME}.mp4")
+        #         clip2 = VideoFileClip(f"{folder_video}\\5-8_{CLIP_NAME}.mp4")
+        #         result_clip = VideoEditor.create_transition([clip1, clip2],overlap=0.5)
+        #         result_clip.write_videofile(f"{folder_video}\\1-8_{CLIP_NAME}.mp4", codec="libx264", audio_codec=None)
+        #         clip1.close()
+        #         clip2.close()
+        #         result_clip.close()
+        # except:
+        #     exit('Error: Failed to create video 1-8')
+        # try:
+        #     if os.path.exists(f'{folder_video}\\9-14_{CLIP_NAME}.mp4'):
+        #         print(f"File 9-14_{CLIP_NAME}.mp4 found in the folder.")
+        #     else:
+        #         clip1 = VideoFileClip(f"{folder_video}\\9-12_{CLIP_NAME}.mp4")
+        #         clip2 = VideoFileClip(f"{folder_video}\\1314_{CLIP_NAME}.mp4")
+        #         result_clip = VideoEditor.create_transition([clip1, clip2],overlap=0.5)
+        #         result_clip.write_videofile(f"{folder_video}\\9-14_{CLIP_NAME}.mp4", codec="libx264", audio_codec=None)
+        #         clip1.close()
+        #         clip2.close()
+        #         result_clip.close()
+        # except:
+        #     exit('Error: Failed to create video 9-14')
+        # try:
+        #     if os.path.exists(f'{folder_video}\\1-14_{CLIP_NAME}.mp4'):
+        #         print(f"File 9-14_{CLIP_NAME}.mp4 found in the folder.")
+        #     else:
+        #         clip1 = VideoFileClip(f"{folder_video}\\1-8_{CLIP_NAME}.mp4")
+        #         clip2 = VideoFileClip(f"{folder_video}\\9-14_{CLIP_NAME}.mp4")
+        #         result_clip = VideoEditor.create_transition([clip1, clip2],overlap=0.5)
+        #         result_clip.write_videofile(f"{folder_video}\\1-14_{CLIP_NAME}.mp4", codec="libx264", audio_codec=None)
+        #         clip1.close()
+        #         clip2.close()
+        #         result_clip.close()
+        # except:
+        #     exit('Error: Failed to create video 1-14')
+
+        # ------------------------------------------------------------- END ----------------------------------------------------------------------------
 
         try:
             if os.path.exists(video_sound):
                 print(f"File {video_sound} found in the folder.")
             else:
-                video = f"{folder_video}\\1-14_{CLIP_NAME}.mp4"
+                video = f"{folder_video}\\1-14.mp4"
                 result_clip = VideoEditor.combinate(audio_path=audio_file,video_path=video,output_path=video_sound)
         except:
             exit('Error: Failed to create video video_sub')
@@ -375,7 +432,7 @@ def create_shorts_en():
 
 
 def main():
-    # start_time = time.time()
+    start_time = time.time()
 
     create_shorts_ru()
     # # create_shorts_en()
@@ -383,16 +440,12 @@ def main():
     # len = len_simbols('text\\Snow_en.txt')
     # print(len)
 
-    # end_time = time.time()
-    # execution_time = end_time - start_time
-    # print(f"Время выполнения: {execution_time/60} минут")
+    end_time = time.time()
+    execution_time = end_time - start_time
+    print(f"Время выполнения: {execution_time/60} минут")
 
-    # img = Image.open('1.jpg')
-    # width, height = img.size
-    # if width>=720 and height>=1280:
-    #     i = height/1280
-    #     new = img.resize((int(width/i), 1280), Image.Resampling.LANCZOS)
-    #     new.save('2.jpg')
+    # ImageEditor.get_pexels_images(api_key=key,save_path=f'image\\{CLIP_NAME}')
+
 
 
 
