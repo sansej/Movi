@@ -22,6 +22,7 @@ class SubtitleEditor:
             duration = end_time - start_time
             video_width, video_height = videosize
             text_clip = TextClip(subtitle[2], fontsize=fontsize, font=font, color=color, bg_color=background, stroke_color=stroke_color, stroke_width=stroke_width,size=(video_width*3/4, None), method='caption').set_start(start_time).set_duration(duration)
+            # print ( text_clip.list("font") )
             subtitle_x_position = xy_pos[0]
             subtitle_y_position = xy_pos[1]
             text_position = (subtitle_x_position, subtitle_y_position)                    
