@@ -85,19 +85,22 @@ def create_shorts_ru():
         else:
             print(f"Folder {folder_video} already exists")
 
-        # try:
-        #     count = 1
-        #     for file in os.listdir(folter_image_crop):
-        #         if file.endswith(f".jpg"):
-        #             file_name = file.split('.')
-        #             if count%3!=0:
-        #                 rev = False
-        #             else:
-        #                 rev = True
-        #             ImageEditor.ken_burns_effect_video(image_path=f'{folter_image_crop}\\{file}', output_path=f'{folder_video}\\{file_name[0]}.mp4', duration=5, reverse=rev)
-        #             count += 1
-        # except:
-        #     exit('Error: Failed to create video')
+        try:
+            count = 1
+            for file in os.listdir(folter_image_crop):
+                if file.endswith(f".jpg"):
+                    file_name = file.split('.')
+                    if count%3!=0:
+                        rev = False
+                    else:
+                        rev = True
+                    if os.path.exists(f'{folder_video}\\{file_name[0]}.mp4'):
+                        print(f"File {folder_video}\\{file_name[0]}.mp4 found in the folder.")
+                    else:
+                        ImageEditor.ken_burns_effect_video(image_path=f'{folter_image_crop}\\{file}', output_path=f'{folder_video}\\{file_name[0]}.mp4', duration=5, reverse=rev)
+                    count += 1
+        except:
+            exit('Error: Failed to create video')
 
         if not os.path.exists(folder_final):
             os.makedirs(folder_final)
@@ -107,50 +110,54 @@ def create_shorts_ru():
 
         # -------------------------------------------------------------------- CREATE VIDEO -----------------------------------------------------------------------------
         current_file = ''
-        for i in range(1,15):
-            file = f"{i}.mp4"
-            if i%2!=0:
-                current_file = file
-            else:
-                a = current_file.split('.')
-                b = file.split('.')
-                clip1 = VideoFileClip(f"{folder_video}\\{current_file}")
-                clip2 = VideoFileClip(f"{folder_video}\\{file}")
-                result_clip = VideoEditor.create_transition([clip1, clip2],overlap=0.5)
-                result_clip.write_videofile(f"{folder_final}\\{a[0]}-{b[0]}.mp4", codec="libx264", audio_codec=None)
-                clip1.close()
-                clip2.close()
-                result_clip.close()
-
-        for i,item in enumerate(['1-2','3-4','5-6','7-8','9-10','11-12','13-14']):
-            file = f'{item}.mp4'
-            if i==0:
-                current_file = file
-            else:
-                a = current_file.split('-')
-                b = file.split('.')[0].split('-')
-                clip1 = VideoFileClip(f"{folder_final}\\{current_file}")
-                clip2 = VideoFileClip(f"{folder_final}\\{file}")
-                result_clip = VideoEditor.create_transition([clip1, clip2],overlap=0.5)
-                result_clip.write_videofile(f"{folder_final}\\{a[0]}-{b[1]}.mp4", codec="libx264", audio_codec=None)
-                current_file = f'{a[0]}-{b[1]}.mp4'
-                clip1.close()
-                clip2.close()
-                result_clip.close()
 
         # for i in range(1,15):
         #     file = f"{i}.mp4"
-        #     if i==1:
+        #     if i%2!=0:
         #         current_file = file
         #     else:
+        #         a = current_file.split('.')
+        #         b = file.split('.')
         #         clip1 = VideoFileClip(f"{folder_video}\\{current_file}")
         #         clip2 = VideoFileClip(f"{folder_video}\\{file}")
         #         result_clip = VideoEditor.create_transition([clip1, clip2],overlap=0.5)
-        #         result_clip.write_videofile(f"{folder_video}\\1-{i}.mp4", codec="libx264", audio_codec=None)
-        #         current_file = f'1-{i}.mp4'
+        #         result_clip.write_videofile(f"{folder_final}\\{a[0]}-{b[0]}.mp4", codec="libx264", audio_codec=None)
         #         clip1.close()
         #         clip2.close()
         #         result_clip.close()
+
+        # for i,item in enumerate(['1-2','3-4','5-6','7-8','9-10','11-12','13-14']):
+        #     file = f'{item}.mp4'
+        #     if i==0:
+        #         current_file = file
+        #     else:
+        #         a = current_file.split('-')
+        #         b = file.split('.')[0].split('-')
+        #         clip1 = VideoFileClip(f"{folder_final}\\{current_file}")
+        #         clip2 = VideoFileClip(f"{folder_final}\\{file}")
+        #         result_clip = VideoEditor.create_transition([clip1, clip2],overlap=0.5)
+        #         result_clip.write_videofile(f"{folder_final}\\{a[0]}-{b[1]}.mp4", codec="libx264", audio_codec=None)
+        #         current_file = f'{a[0]}-{b[1]}.mp4'
+        #         clip1.close()
+        #         clip2.close()
+        #         result_clip.close()
+
+        for i in range(1,15):
+            file = f"{i}.mp4"
+            if i==1:
+                current_file = file
+            else:
+                clip1 = VideoFileClip(f"{folder_video}\\{current_file}")
+                clip2 = VideoFileClip(f"{folder_video}\\{file}")
+                if os.path.exists(f"{folder_video}\\1-{i}.mp4"):
+                    print(f"File {folder_video}\\1-{i}.mp4 found in the folder.")
+                else:
+                    result_clip = VideoEditor.create_transition([clip1, clip2],overlap=0.6)
+                    result_clip.write_videofile(f"{folder_video}\\1-{i}.mp4", codec="libx264", audio_codec=None)
+                    result_clip.close()
+                clip1.close()
+                clip2.close()
+                current_file = f'1-{i}.mp4'
 
 
 
@@ -331,10 +338,18 @@ def create_shorts_ru():
         # ------------------------------------------------------------- END ----------------------------------------------------------------------------
 
         try:
+            if os.path.exists(f'{folder_video}\\1-14_crop.mp4'):
+                print(f"File 1-14_crop.mp4 found in the folder.")
+            else:
+                VideoEditor.crop(video_path=f'{folder_video}\\1-14.mp4', output_path= f'{folder_video}\\1-14_crop.mp4', audio_path = audio_file)
+        except:
+            exit(f'Error: Failed to crop video 1-14_crop.mp4')
+
+        try:
             if os.path.exists(video_sound):
                 print(f"File {video_sound} found in the folder.")
             else:
-                video = f"{folder_video}\\1-14.mp4"
+                video = f"{folder_video}\\1-14_crop.mp4"
                 result_clip = VideoEditor.combinate(audio_path=audio_file,video_path=video,output_path=video_sound)
         except:
             exit('Error: Failed to create video video_sub')
@@ -342,7 +357,7 @@ def create_shorts_ru():
         try:
             if text!='':
                 sub = AudioEditor.to_subtitle(audio_file_path=audio_file, text=text)
-                sub_clip = SubtitleEditor.create_subtitle_clips(sub,(720,1280),fontsize=70, stroke_color='black')
+                sub_clip = SubtitleEditor.create_subtitle_clips(sub,(720,1280),fontsize=70, stroke_color='black',font='Segoe-UI-Bold')
             else:
                 exit(f'Error: File {CLIP_NAME}.txt is empty')
         except:
@@ -389,12 +404,20 @@ def create_shorts_en():
             AudioEditor.create_voice(text=text,output_file=audio_file)
     except:
         exit('Error: Failed to create sound')   
+
+    try:
+        if os.path.exists(f'{folder_video}\\1-14.mp4'):
+            VideoEditor.crop(video_path=f'{folder_video}\\1-14.mp4', output_path= f'{folder_video}\\1-14_crop.mp4', audio_path=audio_file)
+        else:
+            print(f"File 1-14_crop.mp4 not found in the folder.")
+    except:
+        exit(f'Error: Failed to crop video 1-14.mp4')
     
     try:
         if os.path.exists(video_sound):
             print(f"File {video_sound} found in the folder.")
         else:
-            video = f"{folder_video}\\1-9_{CLIP_NAME}.mp4"
+            video = f"{folder_video}\\1-14_crop.mp4"
             result_clip = VideoEditor.combinate(audio_path=audio_file,video_path=video,output_path=video_sound)
     except:
         exit('Error: Failed to create video video_sub')
@@ -409,24 +432,17 @@ def create_shorts_en():
         exit('Error: Failed to create subtitles')
             
     try:
-        if os.path.exists(f'{folder_video}\\final_video_{CLIP_NAME}_en.mp4'):
-            print(f"File final_video_{CLIP_NAME}_en.mp4 found in the folder.")
+        if os.path.exists(f'{folder_video}\\final_video_en.mp4'):
+            print(f"File final_video_en.mp4 found in the folder.")
         else:
             clip = VideoFileClip(video_sound)
             result_clip = VideoEditor.create_transition([clip],sub_clip,overlap=0.5)
-            result_clip.write_videofile(f'{folder_video}\\final_video_{CLIP_NAME}_en.mp4', codec="libx264", audio_codec=None)
+            result_clip.write_videofile(f'{folder_video}\\final_video_en.mp4', codec="libx264", audio_codec=None)
             clip.close()
             result_clip.close()
     except:
-        exit('Error: Failed to create video video_sub')
+        exit('Error: Failed to create video final_video_en.mp4')
 
-    try:
-        if os.path.exists(f'{folder_video}\\final_video_{CLIP_NAME}_en.mp4'):
-            VideoEditor.crop(video_path=f'{folder_video}\\final_video_{CLIP_NAME}_en.mp4', output_path= f'{folder_video}\\final_video_crop_{CLIP_NAME}_en.mp4')
-        else:
-            print(f"File final_video_{CLIP_NAME}_en.mp4 not found in the folder.")
-    except:
-        exit(f'Error: Failed to crop video final_video_{CLIP_NAME}_en.mp4')
     print('Successfully!')
 
 
@@ -434,11 +450,11 @@ def create_shorts_en():
 def main():
     start_time = time.time()
 
-    create_shorts_ru()
-    # # create_shorts_en()
+    # create_shorts_ru()
+    # create_shorts_en()
 
-    # len = len_simbols('text\\Snow_en.txt')
-    # print(len)
+    len = len_simbols('text\\MilkyWay_ru.txt')
+    print(len)
 
     end_time = time.time()
     execution_time = end_time - start_time

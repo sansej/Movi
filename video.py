@@ -63,7 +63,7 @@ class VideoEditor:
         video_clip.close()
         audio_clip.close()
 
-    def crop(video_path, output_path, duration=60):
+    def crop(video_path,  output_path, duration=None, audio_path=None):
         """
         Parameters
         -----------
@@ -75,17 +75,28 @@ class VideoEditor:
 
         """
         video_clip = VideoFileClip(video_path)
-        if video_clip.duration<=duration:
-            print('Crop no required')
-            return
-        cropped_clip = video_clip.subclip(0, duration)
-        cropped_clip.write_videofile(output_path, codec='libx264', audio_codec='aac')
-        video_clip.close()
-        cropped_clip.close()
 
-
-
-
-
-
-
+        if audio_path:
+            audio_clip = AudioFileClip(audio_path)
+            if video_clip.duration>audio_clip.duration:
+                trimmed_video = video_clip.subclip(0, audio_clip.duration)
+                trimmed_video.write_videofile(output_path, codec='libx264', audio_codec=None)
+                video_clip.close()
+                trimmed_video.close()
+                audio_clip.close()
+                return
+            else:
+                return
+        
+        if duration:
+            if video_clip.duration<=duration:
+                print('Crop no required')
+                return
+            else:
+                cropped_clip = video_clip.subclip(0, duration)
+                cropped_clip.write_videofile(output_path, codec='libx264', audio_codec=None)
+                video_clip.close()
+                cropped_clip.close()
+                return
+            
+        
