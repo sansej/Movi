@@ -12,6 +12,7 @@ import wave
 import numpy as np
 import time
 from PIL import Image
+import cv2
 key = 'MVsaiNhymA81LvKqS9oezJeEpyZ2pYDtq9zFFQvnuWPwCMPmhiOLaI88'
 
 CLIP_NAME = 'Lava'
@@ -109,39 +110,8 @@ def create_shorts_ru():
             print(f"Folder {folder_final} already exists")
 
         # -------------------------------------------------------------------- CREATE VIDEO -----------------------------------------------------------------------------
+        
         current_file = ''
-
-        # for i in range(1,15):
-        #     file = f"{i}.mp4"
-        #     if i%2!=0:
-        #         current_file = file
-        #     else:
-        #         a = current_file.split('.')
-        #         b = file.split('.')
-        #         clip1 = VideoFileClip(f"{folder_video}\\{current_file}")
-        #         clip2 = VideoFileClip(f"{folder_video}\\{file}")
-        #         result_clip = VideoEditor.create_transition([clip1, clip2],overlap=0.5)
-        #         result_clip.write_videofile(f"{folder_final}\\{a[0]}-{b[0]}.mp4", codec="libx264", audio_codec=None)
-        #         clip1.close()
-        #         clip2.close()
-        #         result_clip.close()
-
-        # for i,item in enumerate(['1-2','3-4','5-6','7-8','9-10','11-12','13-14']):
-        #     file = f'{item}.mp4'
-        #     if i==0:
-        #         current_file = file
-        #     else:
-        #         a = current_file.split('-')
-        #         b = file.split('.')[0].split('-')
-        #         clip1 = VideoFileClip(f"{folder_final}\\{current_file}")
-        #         clip2 = VideoFileClip(f"{folder_final}\\{file}")
-        #         result_clip = VideoEditor.create_transition([clip1, clip2],overlap=0.5)
-        #         result_clip.write_videofile(f"{folder_final}\\{a[0]}-{b[1]}.mp4", codec="libx264", audio_codec=None)
-        #         current_file = f'{a[0]}-{b[1]}.mp4'
-        #         clip1.close()
-        #         clip2.close()
-        #         result_clip.close()
-
         for i in range(1,15):
             file = f"{i}.mp4"
             if i==1:
@@ -158,182 +128,6 @@ def create_shorts_ru():
                 clip1.close()
                 clip2.close()
                 current_file = f'1-{i}.mp4'
-
-
-
-        # try:
-        #     if os.path.exists(f'{folder_video}\\12_{CLIP_NAME}.mp4'):
-        #         print(f"File 12_{CLIP_NAME}.mp4 found in the folder.")
-        #     else:
-        #         clip1 = VideoFileClip(f"{folder_video}\\1_{CLIP_NAME}.mp4")
-        #         clip2 = VideoFileClip(f"{folder_video}\\2_{CLIP_NAME}.mp4")
-        #         result_clip = VideoEditor.create_transition([clip1, clip2],overlap=0.5)
-        #         result_clip.write_videofile(f"{folder_video}\\12_{CLIP_NAME}.mp4", codec="libx264", audio_codec=None)
-        #         clip1.close()
-        #         clip2.close()
-        #         result_clip.close()
-        # except:
-        #     exit('Error: Failed to create video 12')
-        # try:
-        #     if os.path.exists(f'{folder_video}\\34_{CLIP_NAME}.mp4'):
-        #         print(f"File 34_{CLIP_NAME}.mp4 found in the folder.")
-        #     else:
-        #         clip1 = VideoFileClip(f"{folder_video}\\3_{CLIP_NAME}.mp4")
-        #         clip2 = VideoFileClip(f"{folder_video}\\4_{CLIP_NAME}.mp4")
-        #         result_clip = VideoEditor.create_transition([clip1, clip2],overlap=0.5)
-        #         result_clip.write_videofile(f"{folder_video}\\34_{CLIP_NAME}.mp4", codec="libx264", audio_codec=None)
-        #         clip1.close()
-        #         clip2.close()
-        #         result_clip.close()
-        # except:
-        #     exit('Error: Failed to create video 34')
-        # try:
-        #     if os.path.exists(f'{folder_video}\\56_{CLIP_NAME}.mp4'):
-        #         print(f"File 56_{CLIP_NAME}.mp4 found in the folder.")
-        #     else:
-        #         clip1 = VideoFileClip(f"{folder_video}\\5_{CLIP_NAME}.mp4")
-        #         clip2 = VideoFileClip(f"{folder_video}\\6_{CLIP_NAME}.mp4")
-        #         result_clip = VideoEditor.create_transition([clip1, clip2],overlap=0.5)
-        #         result_clip.write_videofile(f"{folder_video}\\56_{CLIP_NAME}.mp4", codec="libx264", audio_codec=None)
-        #         clip1.close()
-        #         clip2.close()
-        #         result_clip.close()
-        # except:
-        #     exit('Error: Failed to create video 56')
-        # try:
-        #     if os.path.exists(f'{folder_video}\\78_{CLIP_NAME}.mp4'):
-        #         print(f"File 78_{CLIP_NAME}.mp4 found in the folder.")
-        #     else:
-        #         clip1 = VideoFileClip(f"{folder_video}\\7_{CLIP_NAME}.mp4")
-        #         clip2 = VideoFileClip(f"{folder_video}\\8_{CLIP_NAME}.mp4")
-        #         result_clip = VideoEditor.create_transition([clip1, clip2],overlap=0.5)
-        #         result_clip.write_videofile(f"{folder_video}\\78_{CLIP_NAME}.mp4", codec="libx264", audio_codec=None)
-        #         clip1.close()
-        #         clip2.close()
-        #         result_clip.close()
-        # except:
-        #     exit('Error: Failed to create video 78')
-        
-        # try:
-        #     if os.path.exists(f'{folder_video}\\910_{CLIP_NAME}.mp4'):
-        #         print(f"File 910_{CLIP_NAME}.mp4 found in the folder.")
-        #     else:
-        #         clip1 = VideoFileClip(f"{folder_video}\\9_{CLIP_NAME}.mp4")
-        #         clip2 = VideoFileClip(f"{folder_video}\\10_{CLIP_NAME}.mp4")
-        #         result_clip = VideoEditor.create_transition([clip1, clip2],overlap=0.5)
-        #         result_clip.write_videofile(f"{folder_video}\\910_{CLIP_NAME}.mp4", codec="libx264", audio_codec=None)
-        #         clip1.close()
-        #         clip2.close()
-        #         result_clip.close()
-        # except:
-        #     exit('Error: Failed to create video 910')
-
-        # try:
-        #     if os.path.exists(f'{folder_video}\\1112_{CLIP_NAME}.mp4'):
-        #         print(f"File 1112_{CLIP_NAME}.mp4 found in the folder.")
-        #     else:
-        #         clip1 = VideoFileClip(f"{folder_video}\\11_{CLIP_NAME}.mp4")
-        #         clip2 = VideoFileClip(f"{folder_video}\\12_{CLIP_NAME}.mp4")
-        #         result_clip = VideoEditor.create_transition([clip1, clip2],overlap=0.5)
-        #         result_clip.write_videofile(f"{folder_video}\\1112_{CLIP_NAME}.mp4", codec="libx264", audio_codec=None)
-        #         clip1.close()
-        #         clip2.close()
-        #         result_clip.close()
-        # except:
-        #     exit('Error: Failed to create video 1112')
-
-        # try:
-        #     if os.path.exists(f'{folder_video}\\1314_{CLIP_NAME}.mp4'):
-        #         print(f"File 1314_{CLIP_NAME}.mp4 found in the folder.")
-        #     else:
-        #         clip1 = VideoFileClip(f"{folder_video}\\13_{CLIP_NAME}.mp4")
-        #         clip2 = VideoFileClip(f"{folder_video}\\14_{CLIP_NAME}.mp4")
-        #         result_clip = VideoEditor.create_transition([clip1, clip2],overlap=0.5)
-        #         result_clip.write_videofile(f"{folder_video}\\1314_{CLIP_NAME}.mp4", codec="libx264", audio_codec=None)
-        #         clip1.close()
-        #         clip2.close()
-        #         result_clip.close()
-        # except:
-        #     exit('Error: Failed to create video 1314')
-
-        # try:
-        #     if os.path.exists(f'{folder_video}\\1-4_{CLIP_NAME}.mp4'):
-        #         print(f"File 1-4_{CLIP_NAME}.mp4 found in the folder.")
-        #     else:
-        #         clip1 = VideoFileClip(f"{folder_video}\\12_{CLIP_NAME}.mp4")
-        #         clip2 = VideoFileClip(f"{folder_video}\\34_{CLIP_NAME}.mp4")
-        #         result_clip = VideoEditor.create_transition([clip1, clip2],overlap=0.5)
-        #         result_clip.write_videofile(f"{folder_video}\\1-4_{CLIP_NAME}.mp4", codec="libx264", audio_codec=None)
-        #         clip1.close()
-        #         clip2.close()
-        #         result_clip.close()
-        # except:
-        #     exit('Error: Failed to create video 1-4')
-        # try:
-        #     if os.path.exists(f'{folder_video}\\5-8_{CLIP_NAME}.mp4'):
-        #         print(f"File 5-8_{CLIP_NAME}.mp4 found in the folder.")
-        #     else:
-        #         clip1 = VideoFileClip(f"{folder_video}\\56_{CLIP_NAME}.mp4")
-        #         clip2 = VideoFileClip(f"{folder_video}\\78_{CLIP_NAME}.mp4")
-        #         result_clip = VideoEditor.create_transition([clip1, clip2],overlap=0.5)
-        #         result_clip.write_videofile(f"{folder_video}\\5-8_{CLIP_NAME}.mp4", codec="libx264", audio_codec=None)
-        #         clip1.close()
-        #         clip2.close()
-        #         result_clip.close()
-        # except:
-        #     exit('Error: Failed to create video 5-8')
-        # try:
-        #     if os.path.exists(f'{folder_video}\\9-12_{CLIP_NAME}.mp4'):
-        #         print(f"File 9-14_{CLIP_NAME}.mp4 found in the folder.")
-        #     else:
-        #         clip1 = VideoFileClip(f"{folder_video}\\910_{CLIP_NAME}.mp4")
-        #         clip2 = VideoFileClip(f"{folder_video}\\1112_{CLIP_NAME}.mp4")
-        #         result_clip = VideoEditor.create_transition([clip1, clip2],overlap=0.5)
-        #         result_clip.write_videofile(f"{folder_video}\\9-12_{CLIP_NAME}.mp4", codec="libx264", audio_codec=None)
-        #         clip1.close()
-        #         clip2.close()
-        #         result_clip.close()
-        # except:
-        #     exit('Error: Failed to create video 9-12')
-        # try:
-        #     if os.path.exists(f'{folder_video}\\1-8_{CLIP_NAME}.mp4'):
-        #         print(f"File 1-8_{CLIP_NAME}.mp4 found in the folder.")
-        #     else:
-        #         clip1 = VideoFileClip(f"{folder_video}\\1-4_{CLIP_NAME}.mp4")
-        #         clip2 = VideoFileClip(f"{folder_video}\\5-8_{CLIP_NAME}.mp4")
-        #         result_clip = VideoEditor.create_transition([clip1, clip2],overlap=0.5)
-        #         result_clip.write_videofile(f"{folder_video}\\1-8_{CLIP_NAME}.mp4", codec="libx264", audio_codec=None)
-        #         clip1.close()
-        #         clip2.close()
-        #         result_clip.close()
-        # except:
-        #     exit('Error: Failed to create video 1-8')
-        # try:
-        #     if os.path.exists(f'{folder_video}\\9-14_{CLIP_NAME}.mp4'):
-        #         print(f"File 9-14_{CLIP_NAME}.mp4 found in the folder.")
-        #     else:
-        #         clip1 = VideoFileClip(f"{folder_video}\\9-12_{CLIP_NAME}.mp4")
-        #         clip2 = VideoFileClip(f"{folder_video}\\1314_{CLIP_NAME}.mp4")
-        #         result_clip = VideoEditor.create_transition([clip1, clip2],overlap=0.5)
-        #         result_clip.write_videofile(f"{folder_video}\\9-14_{CLIP_NAME}.mp4", codec="libx264", audio_codec=None)
-        #         clip1.close()
-        #         clip2.close()
-        #         result_clip.close()
-        # except:
-        #     exit('Error: Failed to create video 9-14')
-        # try:
-        #     if os.path.exists(f'{folder_video}\\1-14_{CLIP_NAME}.mp4'):
-        #         print(f"File 9-14_{CLIP_NAME}.mp4 found in the folder.")
-        #     else:
-        #         clip1 = VideoFileClip(f"{folder_video}\\1-8_{CLIP_NAME}.mp4")
-        #         clip2 = VideoFileClip(f"{folder_video}\\9-14_{CLIP_NAME}.mp4")
-        #         result_clip = VideoEditor.create_transition([clip1, clip2],overlap=0.5)
-        #         result_clip.write_videofile(f"{folder_video}\\1-14_{CLIP_NAME}.mp4", codec="libx264", audio_codec=None)
-        #         clip1.close()
-        #         clip2.close()
-        #         result_clip.close()
-        # except:
-        #     exit('Error: Failed to create video 1-14')
 
         # ------------------------------------------------------------- END ----------------------------------------------------------------------------
 
@@ -445,18 +239,148 @@ def create_shorts_en():
 
     print('Successfully!')
 
+def chromoKey():
 
+    # Определение диапазона цветов хромакея (зеленого фона)
+    lower_green = np.array([40, 50, 50])
+    upper_green = np.array([90, 255, 255])
+
+    # Загрузка видеофайлов
+    cap_chromakey = cv2.VideoCapture('mrSim.mp4')
+    cap_background = cv2.VideoCapture('video\\Comet\\78_Comet.mp4')
+
+    # # Определение параметров видео (ширина, высота и частота кадров)
+    # width_chromakey = int(cap_chromakey.get(3))
+    # height_chromakey = int(cap_chromakey.get(4))
+    # # print(width_chromakey,height_chromakey)
+
+    # width_background = int(cap_background.get(3))
+    # height_background = int(cap_background.get(4))
+    # # print(width_background,height_background)
+
+    # fps = int(cap_chromakey.get(5))
+
+    # # Определение кодека и создание объекта VideoWriter
+    # fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # Используйте 'mp4v' для кодирования в MP4
+    # out = cv2.VideoWriter('output_with_background.mp4', fourcc, fps, (width_background, height_background))
+
+    # while cap_chromakey.isOpened() and cap_background.isOpened():
+    #     ret_chromakey, frame_chromakey = cap_chromakey.read()
+    #     ret_background, frame_background = cap_background.read()
+
+    #     if not ret_chromakey or not ret_background:
+    #         break
+
+    #     # Преобразование изображения в цветовое пространство HSV
+    #     hsv = cv2.cvtColor(frame_chromakey, cv2.COLOR_BGR2HSV)
+
+    #     # Создание маски хромакея
+    #     mask = cv2.inRange(hsv, lower_green, upper_green)
+
+    #     # Инвертирование маски
+    #     inverted_mask = cv2.bitwise_not(mask)
+
+    #     # Применение инвертированной маски к кадру хромакея
+    #     chromakey_result = cv2.bitwise_and(frame_chromakey, frame_chromakey, mask=inverted_mask)
+
+    #     # Применение маски к заднему фону
+    #     background_result = cv2.bitwise_and(frame_background, frame_background, mask=mask)
+
+    #     # Изменение размеров кадра хромакея
+    #     chromakey_result = cv2.resize(chromakey_result, (width_background, height_background))
+
+    #     # Сложение двух кадров
+    #     result = cv2.addWeighted(chromakey_result, 1, background_result, 1, 0, dtype=cv2.CV_8U)
+
+    #     # Запись обработанного кадра в видеофайл
+    #     out.write(result)
+
+    #     # Отображение результата
+    #     cv2.imshow('With Background', result)
+
+    #     if cv2.waitKey(25) & 0xFF == ord('q'):
+    #         break
+
+    # cap_chromakey.release()
+    # cap_background.release()
+    # out.release()
+    # cv2.destroyAllWindows()
+
+        # Определение параметров видео (ширина, высота и частота кадров)
+    width = int(cap_chromakey.get(3))
+    height = int(cap_chromakey.get(4))
+    fps = int(cap_chromakey.get(5))
+
+    # Определение кодека и создание объекта VideoWriter
+    fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # Используйте 'mp4v' для кодирования в MP4
+    out = cv2.VideoWriter('output_with_background_chromakey.mp4', fourcc, fps, (width, height))
+
+    # Определение начального и конечного кадра для применения хромакея
+    start_frame = 100
+    end_frame = 200
+
+    frame_number = 0
+
+    while cap_chromakey.isOpened() and cap_background.isOpened():
+        ret_chromakey, frame_chromakey = cap_chromakey.read()
+        ret_background, frame_background = cap_background.read()
+
+        if not ret_chromakey or not ret_background:
+            break
+
+        # Преобразование изображения в цветовое пространство HSV
+        hsv = cv2.cvtColor(frame_chromakey, cv2.COLOR_BGR2HSV)
+
+        # Создание маски хромакея
+        mask = cv2.inRange(hsv, lower_green, upper_green)
+
+        # Инвертирование маски
+        inverted_mask = cv2.bitwise_not(mask)
+
+        # Применение инвертированной маски к кадру хромакея
+        chromakey_result = cv2.bitwise_and(frame_chromakey, frame_chromakey, mask=inverted_mask)
+
+        # Применение маски к заднему фону
+        background_result = cv2.bitwise_and(frame_background, frame_background, mask=mask)
+
+        # Изменение размеров кадра хромакея
+        chromakey_result = cv2.resize(chromakey_result, (width, height))
+
+        # Сложение двух кадров только в заданном промежутке
+        if start_frame <= frame_number <= end_frame:
+            result = cv2.addWeighted(chromakey_result, 1, background_result, 1, 0, dtype=cv2.CV_8U)
+        else:
+            result = frame_background
+
+        # Запись обработанного кадра в видеофайл
+        out.write(result)
+
+        # Отображение результата
+        cv2.imshow('With Background Chromakey', result)
+
+        if cv2.waitKey(25) & 0xFF == ord('q'):
+            break
+
+        frame_number += 1
+
+    cap_chromakey.release()
+    cap_background.release()
+    out.release()
+    cv2.destroyAllWindows()
 
 def main():
     start_time = time.time()
 
     # create_shorts_ru()
-    create_shorts_en()
+    # create_shorts_en()
+
 
     # len = len_simbols('text\\voice_Lava_en.txt')
     # print(len)
     # clip = AudioFileClip('audio\\Lava.mp3').duration
     # print(clip)
+
+    chromoKey()
 
     end_time = time.time()
     execution_time = end_time - start_time
