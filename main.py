@@ -14,7 +14,7 @@ import time
 from PIL import Image
 key = 'MVsaiNhymA81LvKqS9oezJeEpyZ2pYDtq9zFFQvnuWPwCMPmhiOLaI88'
 
-CLIP_NAME = 'Snow'
+CLIP_NAME = 'Lava'
 
 def create_shorts_ru():
         count = 1
@@ -432,12 +432,12 @@ def create_shorts_en():
         exit('Error: Failed to create subtitles')
             
     try:
-        if os.path.exists(f'{folder_video}\\final_video_en.mp4'):
+        if os.path.exists(f'{folder_video}\\final_video_{CLIP_NAME}_en.mp4'):
             print(f"File final_video_en.mp4 found in the folder.")
         else:
             clip = VideoFileClip(video_sound)
             result_clip = VideoEditor.create_transition([clip],sub_clip,overlap=0.5)
-            result_clip.write_videofile(f'{folder_video}\\final_video_en.mp4', codec="libx264", audio_codec=None)
+            result_clip.write_videofile(f'{folder_video}\\final_video_{CLIP_NAME}_en.mp4', codec="libx264", audio_codec=None)
             clip.close()
             result_clip.close()
     except:
@@ -451,10 +451,12 @@ def main():
     start_time = time.time()
 
     # create_shorts_ru()
-    # create_shorts_en()
+    create_shorts_en()
 
-    len = len_simbols('text\\MilkyWay_ru.txt')
-    print(len)
+    # len = len_simbols('text\\voice_Lava_en.txt')
+    # print(len)
+    # clip = AudioFileClip('audio\\Lava.mp3').duration
+    # print(clip)
 
     end_time = time.time()
     execution_time = end_time - start_time
