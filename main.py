@@ -380,7 +380,9 @@ def main():
     # clip = AudioFileClip('audio\\Lava.mp3').duration
     # print(clip)
 
-    chromoKey()
+    # chromoKey()
+    # ImageEditor.create_main_frame(image_path='image_crop\\Lava\\1.jpg', subtitle_text='Лава Интересные факты', output_path='out.jpg')
+    ImageEditor.create_frame(image_path='image_crop\\Lava\\1.jpg', subtitle_text='Лава. Интересные факты', output_path='out2.jpg')
 
     end_time = time.time()
     execution_time = end_time - start_time
