@@ -1,6 +1,8 @@
 from moviepy.editor import VideoFileClip, AudioFileClip, CompositeVideoClip, TextClip
 from audio import AudioEditor
 from subtitle import SubtitleEditor
+import cv2
+import numpy as np
 
 class VideoEditor:
 
@@ -19,14 +21,6 @@ class VideoEditor:
         resize - Error ``False`` | crop to min resolution ``True`` (if different resolutions)
 
         """
-        # if clip1.size!=clip2.size:
-        #     if resize:
-        #         common_height = min(clip1.size[1], clip2.size[1])
-        #         clip1 = clip1.resize(height=common_height)
-        #         clip2 = clip2.resize(height=common_height)
-        #     else:
-        #         print("Warning: The incoming videos have different resolutions.")
-        #         return
         if subtitles_clip:
             final_clip = CompositeVideoClip(video_files + subtitles_clip)
         else:
@@ -39,25 +33,6 @@ class VideoEditor:
         audio_clip = AudioFileClip(audio_path)
         video_durasion = video_clip.duration
         audio_durasion = audio_clip.duration
-        # if video_durasion!=audio_durasion:
-        #     print('Files have different durations!')
-        #     if crop and video_durasion>audio_durasion:
-        #         trimmed_video = video_clip.subclip(0, audio_durasion)
-        #         trimmed_video = trimmed_video.set_audio(audio_clip)
-        #         trimmed_video.write_videofile(output_path, codec='libx264', audio_codec='aac')
-        #         video_clip.close()
-        #         trimmed_video.close()
-        #         audio_clip.close()
-        #         return
-        #     if crop and video_durasion<audio_durasion:
-        #         trimmed_audio = audio_clip.subclip(0, video_durasion)
-        #         video_clip = video_clip.set_audio(trimmed_audio)
-        #         video_clip.write_videofile(output_path, codec='libx264', audio_codec='aac')
-        #         audio_clip.close()
-        #         trimmed_audio.close()
-        #         video_clip.close()
-        #         return
-        # else:
         video_clip = video_clip.set_audio(audio_clip)
         video_clip.write_videofile(output_path, codec='libx264', audio_codec='aac')
         video_clip.close()
@@ -98,5 +73,43 @@ class VideoEditor:
                 video_clip.close()
                 cropped_clip.close()
                 return
+            
+    def chromoKey(input_path, output_path, start_frame, end_frame, chromo_path='mrSim.mp4'):
+        lower_green = np.array([40, 50, 50]) # Определение диапазона цветов хромакея (зеленого фона)
+        upper_green = np.array([90, 255, 255])
+        cap_chromakey = cv2.VideoCapture(chromo_path)
+        cap_background = cv2.VideoCapture(input_path)       
+        width = int(cap_chromakey.get(3))# Определение параметров видео (ширина, высота и частота кадров)
+        height = int(cap_chromakey.get(4))
+        fps = int(cap_chromakey.get(5))
+        fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # Используйте 'mp4v' для кодирования в MP4
+        out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
+        start_frame = 100 # Определение начального и конечного кадра для применения хромакея
+        end_frame = 200
+        frame_number = 0
+        while cap_chromakey.isOpened() and cap_background.isOpened():
+            ret_chromakey, frame_chromakey = cap_chromakey.read()
+            ret_background, frame_background = cap_background.read()
+            if not ret_chromakey or not ret_background:
+                break
+            hsv = cv2.cvtColor(frame_chromakey, cv2.COLOR_BGR2HSV)
+            mask = cv2.inRange(hsv, lower_green, upper_green)
+            inverted_mask = cv2.bitwise_not(mask)
+            chromakey_result = cv2.bitwise_and(frame_chromakey, frame_chromakey, mask=inverted_mask)
+            background_result = cv2.bitwise_and(frame_background, frame_background, mask=mask)
+            chromakey_result = cv2.resize(chromakey_result, (width, height))
+            if start_frame <= frame_number <= end_frame:
+                result = cv2.addWeighted(chromakey_result, 1, background_result, 1, 0, dtype=cv2.CV_8U)
+            else:
+                result = frame_background
+            out.write(result)
+            # cv2.imshow('With Background Chromakey', result)# Отображение результата
+            # if cv2.waitKey(25) & 0xFF == ord('q'):
+            #     break
+            frame_number += 1
+        cap_chromakey.release()
+        cap_background.release()
+        out.release()
+        cv2.destroyAllWindows()
             
         

@@ -15,7 +15,8 @@ from PIL import Image
 import cv2
 key = 'MVsaiNhymA81LvKqS9oezJeEpyZ2pYDtq9zFFQvnuWPwCMPmhiOLaI88'
 
-CLIP_NAME = 'Lava'
+CLIP_NAME = 'Mars'
+MAIN_FRAME = 'Марс'
 
 def create_shorts_ru():
         count = 1
@@ -87,6 +88,10 @@ def create_shorts_ru():
             print(f"Folder {folder_video} already exists")
 
         try:
+            ImageEditor.create_frame(image_path=f'image_crop\\{CLIP_NAME}\\1.jpg', subtitle_text=f'{MAIN_FRAME}. Интересные факты', output_path=f'image_crop\\{CLIP_NAME}\\{CLIP_NAME}.jpg')
+        except:
+            exit('Error: Failed to create main frame')
+        try:
             count = 1
             for file in os.listdir(folter_image_crop):
                 if file.endswith(f".jpg"):
@@ -98,7 +103,10 @@ def create_shorts_ru():
                     if os.path.exists(f'{folder_video}\\{file_name[0]}.mp4'):
                         print(f"File {folder_video}\\{file_name[0]}.mp4 found in the folder.")
                     else:
-                        ImageEditor.ken_burns_effect_video(image_path=f'{folter_image_crop}\\{file}', output_path=f'{folder_video}\\{file_name[0]}.mp4', duration=5, reverse=rev)
+                        if count == 1:
+                            ImageEditor.ken_burns_effect_video(image_path=f'{folter_image_crop}\\{file}', output_path=f'{folder_video}\\{file_name[0]}.mp4', duration=5, reverse=rev, main_frame=f'{folter_image_crop}\\{CLIP_NAME}.jpg')
+                        else:
+                            ImageEditor.ken_burns_effect_video(image_path=f'{folter_image_crop}\\{file}', output_path=f'{folder_video}\\{file_name[0]}.mp4', duration=5, reverse=rev)
                     count += 1
         except:
             exit('Error: Failed to create video')
@@ -138,6 +146,11 @@ def create_shorts_ru():
                 VideoEditor.crop(video_path=f'{folder_video}\\1-14.mp4', output_path= f'{folder_video}\\1-14_crop.mp4', audio_path = audio_file)
         except:
             exit(f'Error: Failed to crop video 1-14_crop.mp4')
+
+
+
+
+        return   
 
         try:
             if os.path.exists(video_sound):
@@ -239,150 +252,21 @@ def create_shorts_en():
 
     print('Successfully!')
 
-def chromoKey():
-
-    # Определение диапазона цветов хромакея (зеленого фона)
-    lower_green = np.array([40, 50, 50])
-    upper_green = np.array([90, 255, 255])
-
-    # Загрузка видеофайлов
-    cap_chromakey = cv2.VideoCapture('mrSim.mp4')
-    cap_background = cv2.VideoCapture('video\\Comet\\78_Comet.mp4')
-
-    # # Определение параметров видео (ширина, высота и частота кадров)
-    # width_chromakey = int(cap_chromakey.get(3))
-    # height_chromakey = int(cap_chromakey.get(4))
-    # # print(width_chromakey,height_chromakey)
-
-    # width_background = int(cap_background.get(3))
-    # height_background = int(cap_background.get(4))
-    # # print(width_background,height_background)
-
-    # fps = int(cap_chromakey.get(5))
-
-    # # Определение кодека и создание объекта VideoWriter
-    # fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # Используйте 'mp4v' для кодирования в MP4
-    # out = cv2.VideoWriter('output_with_background.mp4', fourcc, fps, (width_background, height_background))
-
-    # while cap_chromakey.isOpened() and cap_background.isOpened():
-    #     ret_chromakey, frame_chromakey = cap_chromakey.read()
-    #     ret_background, frame_background = cap_background.read()
-
-    #     if not ret_chromakey or not ret_background:
-    #         break
-
-    #     # Преобразование изображения в цветовое пространство HSV
-    #     hsv = cv2.cvtColor(frame_chromakey, cv2.COLOR_BGR2HSV)
-
-    #     # Создание маски хромакея
-    #     mask = cv2.inRange(hsv, lower_green, upper_green)
-
-    #     # Инвертирование маски
-    #     inverted_mask = cv2.bitwise_not(mask)
-
-    #     # Применение инвертированной маски к кадру хромакея
-    #     chromakey_result = cv2.bitwise_and(frame_chromakey, frame_chromakey, mask=inverted_mask)
-
-    #     # Применение маски к заднему фону
-    #     background_result = cv2.bitwise_and(frame_background, frame_background, mask=mask)
-
-    #     # Изменение размеров кадра хромакея
-    #     chromakey_result = cv2.resize(chromakey_result, (width_background, height_background))
-
-    #     # Сложение двух кадров
-    #     result = cv2.addWeighted(chromakey_result, 1, background_result, 1, 0, dtype=cv2.CV_8U)
-
-    #     # Запись обработанного кадра в видеофайл
-    #     out.write(result)
-
-    #     # Отображение результата
-    #     cv2.imshow('With Background', result)
-
-    #     if cv2.waitKey(25) & 0xFF == ord('q'):
-    #         break
-
-    # cap_chromakey.release()
-    # cap_background.release()
-    # out.release()
-    # cv2.destroyAllWindows()
-
-        # Определение параметров видео (ширина, высота и частота кадров)
-    width = int(cap_chromakey.get(3))
-    height = int(cap_chromakey.get(4))
-    fps = int(cap_chromakey.get(5))
-
-    # Определение кодека и создание объекта VideoWriter
-    fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # Используйте 'mp4v' для кодирования в MP4
-    out = cv2.VideoWriter('output_with_background_chromakey.mp4', fourcc, fps, (width, height))
-
-    # Определение начального и конечного кадра для применения хромакея
-    start_frame = 100
-    end_frame = 200
-
-    frame_number = 0
-
-    while cap_chromakey.isOpened() and cap_background.isOpened():
-        ret_chromakey, frame_chromakey = cap_chromakey.read()
-        ret_background, frame_background = cap_background.read()
-
-        if not ret_chromakey or not ret_background:
-            break
-
-        # Преобразование изображения в цветовое пространство HSV
-        hsv = cv2.cvtColor(frame_chromakey, cv2.COLOR_BGR2HSV)
-
-        # Создание маски хромакея
-        mask = cv2.inRange(hsv, lower_green, upper_green)
-
-        # Инвертирование маски
-        inverted_mask = cv2.bitwise_not(mask)
-
-        # Применение инвертированной маски к кадру хромакея
-        chromakey_result = cv2.bitwise_and(frame_chromakey, frame_chromakey, mask=inverted_mask)
-
-        # Применение маски к заднему фону
-        background_result = cv2.bitwise_and(frame_background, frame_background, mask=mask)
-
-        # Изменение размеров кадра хромакея
-        chromakey_result = cv2.resize(chromakey_result, (width, height))
-
-        # Сложение двух кадров только в заданном промежутке
-        if start_frame <= frame_number <= end_frame:
-            result = cv2.addWeighted(chromakey_result, 1, background_result, 1, 0, dtype=cv2.CV_8U)
-        else:
-            result = frame_background
-
-        # Запись обработанного кадра в видеофайл
-        out.write(result)
-
-        # Отображение результата
-        cv2.imshow('With Background Chromakey', result)
-
-        if cv2.waitKey(25) & 0xFF == ord('q'):
-            break
-
-        frame_number += 1
-
-    cap_chromakey.release()
-    cap_background.release()
-    out.release()
-    cv2.destroyAllWindows()
-
 def main():
     start_time = time.time()
 
-    # create_shorts_ru()
+    create_shorts_ru()
     # create_shorts_en()
 
 
-    # len = len_simbols('text\\voice_Lava_en.txt')
+    # len = len_simbols('text\\Mars_ru.txt')
     # print(len)
-    # clip = AudioFileClip('audio\\Lava.mp3').duration
+    # clip = AudioFileClip('audio\\voice_Mars_ru.mp3').duration
     # print(clip)
 
     # chromoKey()
-    # ImageEditor.create_main_frame(image_path='image_crop\\Lava\\1.jpg', subtitle_text='Лава Интересные факты', output_path='out.jpg')
-    ImageEditor.create_frame(image_path='image_crop\\Lava\\1.jpg', subtitle_text='Лава. Интересные факты', output_path='out2.jpg')
+
+    # ImageEditor.create_frame(image_path='image_crop\\Lava\\1.jpg', subtitle_text='Лава. Интересные факты', output_path='out2.jpg')
 
     end_time = time.time()
     execution_time = end_time - start_time

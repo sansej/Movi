@@ -45,7 +45,7 @@ class ImageEditor:
         else:
             print(f"Image resolution ({original_image.width}x{original_image.height}) is less than {target_width}x{target_height}.")
     
-    def ken_burns_effect_video(image_path, output_path, duration=10, zoom_factor=1.4, reverse=False, fps=30):
+    def ken_burns_effect_video(image_path, output_path, duration=10, zoom_factor=1.4, reverse=False, fps=30, main_frame=None):
         """
         Parameters
         -----------
@@ -61,11 +61,13 @@ class ImageEditor:
 
         fps - number of frames per second, , default ``30``
         """
+        frames = []
+        if main_frame != None:
+            frames.append(Image.open(main_frame))
         img = Image.open(image_path)
         new_width = (img.width // 16) * 16
         new_height = (img.height // 16) * 16
         img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
-        frames = []
         long = duration * fps
         for i in range(long):
             current_zoom = 1 + (zoom_factor - 1) * i / long
@@ -105,7 +107,7 @@ class ImageEditor:
 
     
     def create_frame(image_path, output_path, subtitle_text):
-        title_font = ImgFont.truetype("segoeuib.ttf", 70)
+        title_font = ImgFont.truetype("segoeuib.ttf", 90)
         font = ImgFont.truetype("segoeuib.ttf", 60)
         im = Img.open(image_path)
         draw = ImgDraw.Draw(im)
@@ -120,10 +122,10 @@ class ImageEditor:
                     ImgFont.getmask(word, title_font)
                 else:
                     if j==0:
-                        draw.text((50,750+a), word, font=font, fill=(255, 255, 255))
+                        draw.text((50,800+a), word, font=font, fill=(255, 255, 255))
                         ImgFont.getmask(word, font)
                     else:
-                        draw.text((50,750+a+j*70), word, font=font, fill=(255, 255, 255))
+                        draw.text((50,800+a+j*70), word, font=font, fill=(255, 255, 255))
                         ImgFont.getmask(word, font)
         im.save(output_path)
 
