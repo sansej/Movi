@@ -4,7 +4,10 @@ from video import VideoEditor, AudioFileClip
 from image import ImageEditor
 from youtube import post_shorts
 import os 
-from moviepy.editor import VideoFileClip
+from moviepy.editor import VideoFileClip, VideoClip, ImageClip, CompositeVideoClip, TextClip, concatenate_videoclips
+# from moviepy.video.compositing.concatenate import concatenate_videoclips
+from moviepy.config import change_settings
+change_settings({"IMAGEMAGICK_BINARY": r"C:\\Program Files\\ImageMagick-7.1.1-Q16\\magick.exe"})
 # import pyttsx3
 from pydub import AudioSegment
 import fnmatch
@@ -16,7 +19,9 @@ import cv2
 key = 'MVsaiNhymA81LvKqS9oezJeEpyZ2pYDtq9zFFQvnuWPwCMPmhiOLaI88'
 
 CLIP_NAME = 'Mars'
-MAIN_FRAME = 'Марс'
+CLIP_NAME_RU = "Марс"
+SECOND_FRAME_RU = "Интересные факты"
+SECOND_FRAME_EN = 'Interesting Facts'
 
 def create_shorts_ru():
         count = 1
@@ -25,7 +30,6 @@ def create_shorts_ru():
         folter_image_crop = f'image_crop\\{CLIP_NAME}'
         folter_image_resize = f'image_resize\\{CLIP_NAME}'
         folder_video = f'video\\{CLIP_NAME}'
-        folder_final = f'final\\{CLIP_NAME}'
         voice = f'audio\\sound_{CLIP_NAME}.mp3'
         audio_file = f'audio\\voice_{CLIP_NAME}_ru.mp3'
         video_sound = f'video\\{CLIP_NAME}\\video_sound_{CLIP_NAME}.mp4'
@@ -88,9 +92,11 @@ def create_shorts_ru():
             print(f"Folder {folder_video} already exists")
 
         try:
-            ImageEditor.create_frame(image_path=f'image_crop\\{CLIP_NAME}\\1.jpg', subtitle_text=f'{MAIN_FRAME}. Интересные факты', output_path=f'image_crop\\{CLIP_NAME}\\{CLIP_NAME}.jpg')
+            video = VideoClip(make_frame=make_frame_ru, duration=0.1)
+            video.write_videofile(f'video\\{CLIP_NAME}\\{CLIP_NAME}_ru.mp4', fps=24, codec="libx264")
         except:
-            exit('Error: Failed to create main frame')
+            print('Ошибка создания Заставки!')
+
         try:
             count = 1
             for file in os.listdir(folter_image_crop):
@@ -103,19 +109,10 @@ def create_shorts_ru():
                     if os.path.exists(f'{folder_video}\\{file_name[0]}.mp4'):
                         print(f"File {folder_video}\\{file_name[0]}.mp4 found in the folder.")
                     else:
-                        if count == 1:
-                            ImageEditor.ken_burns_effect_video(image_path=f'{folter_image_crop}\\{file}', output_path=f'{folder_video}\\{file_name[0]}.mp4', duration=5, reverse=rev, main_frame=f'{folter_image_crop}\\{CLIP_NAME}.jpg')
-                        else:
-                            ImageEditor.ken_burns_effect_video(image_path=f'{folter_image_crop}\\{file}', output_path=f'{folder_video}\\{file_name[0]}.mp4', duration=5, reverse=rev)
+                        ImageEditor.ken_burns_effect_video(image_path=f'{folter_image_crop}\\{file}', output_path=f'{folder_video}\\{file_name[0]}.mp4', duration=5, reverse=rev)
                     count += 1
         except:
             exit('Error: Failed to create video')
-
-        if not os.path.exists(folder_final):
-            os.makedirs(folder_final)
-            print(f"Folder {folder_final} created")
-        else:
-            print(f"Folder {folder_final} already exists")
 
         # -------------------------------------------------------------------- CREATE VIDEO -----------------------------------------------------------------------------
         
@@ -144,13 +141,9 @@ def create_shorts_ru():
                 print(f"File 1-14_crop.mp4 found in the folder.")
             else:
                 VideoEditor.crop(video_path=f'{folder_video}\\1-14.mp4', output_path= f'{folder_video}\\1-14_crop.mp4', audio_path = audio_file)
+                print('Создан фай 1-14_crop.mp4')
         except:
             exit(f'Error: Failed to crop video 1-14_crop.mp4')
-
-
-
-
-        return   
 
         try:
             if os.path.exists(video_sound):
@@ -158,37 +151,52 @@ def create_shorts_ru():
             else:
                 video = f"{folder_video}\\1-14_crop.mp4"
                 result_clip = VideoEditor.combinate(audio_path=audio_file,video_path=video,output_path=video_sound)
+                print(f'Создан файл video_sound_{CLIP_NAME}.mp4')
         except:
-            exit('Error: Failed to create video video_sub')
+            exit('Ошибка создания видео со звуком!')
         
         try:
             if text!='':
                 sub = AudioEditor.to_subtitle(audio_file_path=audio_file, text=text)
                 sub_clip = SubtitleEditor.create_subtitle_clips(sub,(720,1280),fontsize=70, stroke_color='black',font='Segoe-UI-Bold')
+                print('Созданы субтитры')
             else:
                 exit(f'Error: File {CLIP_NAME}.txt is empty')
         except:
-            exit('Error: Failed to create subtitles')
+            exit('Ошибка создания субтитров!')
 
         try:
-            if os.path.exists(f'{folder_video}\\final_video_{CLIP_NAME}.mp4'):
-                print(f"File final_video_{CLIP_NAME}.mp4 found in the folder.")
+            if os.path.exists(f'{folder_video}\\sub_video_{CLIP_NAME}_ru.mp4'):
+                print(f"File sub_video_{CLIP_NAME}_ru.mp4 found in the folder.")
             else:
                 clip = VideoFileClip(video_sound)
                 result_clip = VideoEditor.create_transition([clip],sub_clip,overlap=0.5)
-                result_clip.write_videofile(f'{folder_video}\\final_video_{CLIP_NAME}.mp4', codec="libx264", audio_codec=None)
+                result_clip.write_videofile(f'{folder_video}\\sub_video_{CLIP_NAME}_ru.mp4', codec="libx264", audio_codec=None)
                 clip.close()
                 result_clip.close()
+                print(f'Создано видео с субтитрами sub_video_{CLIP_NAME}_ru.mp4')
         except:
-            exit('Error: Failed to create video video_sub')
+            exit('Ошибка создания видео с субтитрами!')
 
         try:
-            if os.path.exists(f'{folder_video}\\final_video_{CLIP_NAME}.mp4'):
-                VideoEditor.crop(video_path=f'{folder_video}\\final_video_{CLIP_NAME}.mp4', output_path= f'{folder_video}\\final_video_crop_{CLIP_NAME}.mp4')
-            else:
-                print(f"File final_video_{CLIP_NAME}.mp4 not found in the folder.")
+            video1 = VideoFileClip(f'video\\{CLIP_NAME}\\{CLIP_NAME}_ru.mp4')
+            video2 = VideoFileClip(f'video\\{CLIP_NAME}\\sub_video_{CLIP_NAME}_ru.mp4')
+            final_clip = concatenate_videoclips([video1, video2])
+            final_clip.write_videofile(f'video\\{CLIP_NAME}\\main_frame_ru.mp4', codec="libx264", audio_codec="aac")
+            video1.close()
+            video2.close()
+            print(f'Создано видео с заставкой main_frame_ru.mp4')
         except:
-            exit(f'Error: Failed to crop video final_video_{CLIP_NAME}.mp4')
+            exit('Ошибка обьединения Заставки с видео!')
+
+        try:
+            if os.path.exists(f'{folder_video}\\final_video_{CLIP_NAME}_ru.mp4'):
+                print(f"File final_video_{CLIP_NAME}_ru.mp4 found in the folder.")
+            else:
+                VideoEditor.crop(video_path=f'video\\{CLIP_NAME}\\main_frame_ru.mp4', output_path= f'{folder_video}\\final_video_{CLIP_NAME}_ru.mp4')
+                print(f'Создано финальное видео final_video_{CLIP_NAME}_ru.mp4')
+        except:
+            exit(f'Ошибка создания финального видео final_video_{CLIP_NAME}_ru.mp4!')
         print('Successfully!')
 
 def create_shorts_en():
@@ -213,8 +221,15 @@ def create_shorts_en():
         exit('Error: Failed to create sound')   
 
     try:
+        video = VideoClip(make_frame=make_frame_en, duration=0.1)
+        video.write_videofile(f'video\\{CLIP_NAME}\\{CLIP_NAME}_en.mp4', fps=24, codec="libx264")
+    except:
+        exit('Ошибка создания Заставки!')
+
+    try:
         if os.path.exists(f'{folder_video}\\1-14.mp4'):
-            VideoEditor.crop(video_path=f'{folder_video}\\1-14.mp4', output_path= f'{folder_video}\\1-14_crop.mp4', audio_path=audio_file)
+            VideoEditor.crop(video_path=f'{folder_video}\\1-14.mp4', output_path= f'{folder_video}\\1-14_crop_en.mp4', audio_path=audio_file)
+            print('Создано видео 1-14_crop_en.mp4')
         else:
             print(f"File 1-14_crop.mp4 not found in the folder.")
     except:
@@ -224,8 +239,9 @@ def create_shorts_en():
         if os.path.exists(video_sound):
             print(f"File {video_sound} found in the folder.")
         else:
-            video = f"{folder_video}\\1-14_crop.mp4"
+            video = f"{folder_video}\\1-14_crop_en.mp4"
             result_clip = VideoEditor.combinate(audio_path=audio_file,video_path=video,output_path=video_sound)
+            print(f'Создано видео со звуком {video_sound}')
     except:
         exit('Error: Failed to create video video_sub')
         
@@ -233,40 +249,87 @@ def create_shorts_en():
         if text!='':
             sub = AudioEditor.to_subtitle(audio_file_path=audio_file, text=text)
             sub_clip = SubtitleEditor.create_subtitle_clips(sub,(720,1280),fontsize=70, stroke_color='black', font='Arial-Rounded-MT-Bold')
+            print(f'Созданы субтитры на английском')
         else:
             exit(f'Error: File {CLIP_NAME}.txt is empty')
     except:
         exit('Error: Failed to create subtitles')
             
     try:
-        if os.path.exists(f'{folder_video}\\final_video_{CLIP_NAME}_en.mp4'):
-            print(f"File final_video_en.mp4 found in the folder.")
+        if os.path.exists(f'{folder_video}\\sub_video_{CLIP_NAME}_en.mp4'):
+            print(f"File sub_video_en.mp4 found in the folder.")
         else:
             clip = VideoFileClip(video_sound)
             result_clip = VideoEditor.create_transition([clip],sub_clip,overlap=0.5)
-            result_clip.write_videofile(f'{folder_video}\\final_video_{CLIP_NAME}_en.mp4', codec="libx264", audio_codec=None)
+            result_clip.write_videofile(f'{folder_video}\\sub_video_{CLIP_NAME}_en.mp4', codec="libx264", audio_codec=None)
+            print(f'Создано видео с субтитрами на английском')
             clip.close()
             result_clip.close()
     except:
         exit('Error: Failed to create video final_video_en.mp4')
 
-    print('Successfully!')
+    try:
+        video1 = VideoFileClip(f'video\\{CLIP_NAME}\\{CLIP_NAME}_en.mp4')
+        video2 = VideoFileClip(f'video\\{CLIP_NAME}\\sub_video_{CLIP_NAME}_en.mp4')
+        final_clip = concatenate_videoclips([video1, video2])
+        final_clip.write_videofile(f'video\\{CLIP_NAME}\\main_frame_en.mp4', codec="libx264", audio_codec="aac")
+        video1.close()
+        video2.close()
+        print(f'Создано видео с заставкой main_frame_en.mp4')
+    except:
+        exit('Ошибка обьединения Заставки с видео!')
+
+    try:
+        if os.path.exists(f'{folder_video}\\final_video_{CLIP_NAME}_en.mp4'):
+            print(f"File final_video_{CLIP_NAME}_en.mp4 found in the folder.")
+        else:
+            VideoEditor.crop(video_path=f'video\\{CLIP_NAME}\\main_frame_en.mp4', output_path= f'{folder_video}\\final_video_{CLIP_NAME}_en.mp4')
+            print(f'Создано финальное видео final_video_{CLIP_NAME}_en.mp4')
+    except:
+        exit(f'Ошибка создания финального видео final_video_{CLIP_NAME}_en.mp4!')
+
+    print('ОТЛИЧНАЯ РАБОТА!')
+
+def make_frame_en(t):
+    image_path = f'image_crop\\{CLIP_NAME}\\1.jpg'
+    image_clip = ImageClip(image_path)
+    subtitle_clip_line1 = TextClip(CLIP_NAME, fontsize=24, color='white', stroke_color='black',stroke_width=3, font='Segoe-UI-Bold', size=(image_clip.size[0]*3/4, None))
+    subtitle_clip_line3 = TextClip(SECOND_FRAME_EN, fontsize=24, color='white', stroke_color='black',stroke_width=1,font='Segoe-UI-Bold', size=(image_clip.size[0]*3/4, None))
+    position_line1 = ('center', 'center' )
+    position_line3 = ('center', image_clip.size[1]-500)
+    video_clip = CompositeVideoClip([image_clip, subtitle_clip_line1.set_position(position_line1).set_duration(image_clip.duration), subtitle_clip_line3.set_position(position_line3).set_duration(image_clip.duration)])
+    video_clip = video_clip.set_duration(10)  # Установите нужную продолжительность
+    return video_clip.get_frame(t)
+
+def make_frame_ru(t):
+    image_path = f'image_crop\\{CLIP_NAME}\\1.jpg'
+    image_clip = ImageClip(image_path)
+    subtitle_clip_line1 = TextClip(CLIP_NAME_RU, fontsize=24, color='white', stroke_color='black',stroke_width=3, font='Segoe-UI-Bold', size=(image_clip.size[0]*3/4, None))
+    subtitle_clip_line3 = TextClip(SECOND_FRAME_RU, fontsize=24, color='white', stroke_color='black',stroke_width=1,font='Segoe-UI-Bold', size=(image_clip.size[0]*3/4, None))
+    position_line1 = ('center', 'center' )
+    position_line3 = ('center', image_clip.size[1]-500)
+    video_clip = CompositeVideoClip([image_clip, subtitle_clip_line1.set_position(position_line1).set_duration(image_clip.duration), subtitle_clip_line3.set_position(position_line3).set_duration(image_clip.duration)])
+    video_clip = video_clip.set_duration(10)  # Установите нужную продолжительность
+    return video_clip.get_frame(t)
 
 def main():
     start_time = time.time()
 
-    create_shorts_ru()
-    # create_shorts_en()
+    # create_shorts_ru()
+    create_shorts_en()
 
 
-    # len = len_simbols('text\\Mars_ru.txt')
+    # len = len_simbols('text\\SolarSystemPlanets_ru.txt')
     # print(len)
     # clip = AudioFileClip('audio\\voice_Mars_ru.mp3').duration
     # print(clip)
 
     # chromoKey()
 
-    # ImageEditor.create_frame(image_path='image_crop\\Lava\\1.jpg', subtitle_text='Лава. Интересные факты', output_path='out2.jpg')
+    # VideoEditor.chromoKey(input_path='video\\Mars\\1-14_crop.mp4', output_path='video\\Mars\\chromo.mp4')
+
+
+
 
     end_time = time.time()
     execution_time = end_time - start_time

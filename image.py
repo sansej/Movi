@@ -6,7 +6,7 @@ import cv2
 import numpy as np
 from matplotlib import pyplot as plt
 from PIL import Image
-from moviepy.editor import ImageClip, TextClip, CompositeVideoClip
+from moviepy.editor import ImageClip, TextClip, CompositeVideoClip, VideoClip
 import PILasOPENCV as Img
 import PILasOPENCV as ImgDraw
 import PILasOPENCV as ImgFont
@@ -87,94 +87,71 @@ class ImageEditor:
                 writer.append_data(frame_array)
         print(f'{output_path} video file created')
 
-    def create_main_frame(image_path, subtitle_text, output_path):
-        font_size=4
-        img = cv2.imread(image_path)
-        # Задаем шрифт (в данном случае используем Arial)
-        font = cv2.FONT_HERSHEY_SIMPLEX
-        subtitle_lines = subtitle_text.split(' ')
-        text_sizes = [cv2.getTextSize(line, font, font_size, 2)[0] for line in subtitle_lines]
-        text_x = (img.shape[1] - max(size[0] for size in text_sizes)) // 2
-        text_y = img.shape[0] - 640
-        font_thickness = 15
-        font_scale = font_size
-        font_color_BGR = (255, 255, 255)  # Белый цвет в формате BGR
-        for i, line in enumerate(subtitle_lines):
-            cv2.putText(img, line, (text_x, text_y + i * (text_sizes[i][1] + 80)),
-                        font, font_scale, font_color_BGR, font_thickness, cv2.LINE_AA)
-        cv2.imwrite(output_path, img)
-        print(f"Image with subtitles saved to: {output_path}")
+    # def create_main_frame(image_path, subtitle_text, output_path):
+    #     font_size=4
+    #     img = cv2.imread(image_path)
+    #     # Задаем шрифт (в данном случае используем Arial)
+    #     font = cv2.FONT_HERSHEY_SIMPLEX
+    #     subtitle_lines = subtitle_text.split(' ')
+    #     text_sizes = [cv2.getTextSize(line, font, font_size, 2)[0] for line in subtitle_lines]
+    #     text_x = (img.shape[1] - max(size[0] for size in text_sizes)) // 2
+    #     text_y = img.shape[0] - 640
+    #     font_thickness = 15
+    #     font_scale = font_size
+    #     font_color_BGR = (255, 255, 255)  # Белый цвет в формате BGR
+    #     for i, line in enumerate(subtitle_lines):
+    #         cv2.putText(img, line, (text_x, text_y + i * (text_sizes[i][1] + 80)),
+    #                     font, font_scale, font_color_BGR, font_thickness, cv2.LINE_AA)
+    #     cv2.imwrite(output_path, img)
+    #     print(f"Image with subtitles saved to: {output_path}")
 
     
-    def create_frame(image_path, output_path, subtitle_text):
-        title_font = ImgFont.truetype("segoeuib.ttf", 90)
-        font = ImgFont.truetype("segoeuib.ttf", 60)
-        im = Img.open(image_path)
-        draw = ImgDraw.Draw(im)
-        subtitle_lines = subtitle_text.split('.')
-        a = 0
-        for i, lines in enumerate(subtitle_lines):
-            line = lines.strip().split(' ')
-            for j, word in enumerate(line):
-                if i==0:
-                    draw.text((50,640+j*120), word, font=title_font, fill=(255, 255, 255))
-                    a = j*120
-                    ImgFont.getmask(word, title_font)
-                else:
-                    if j==0:
-                        draw.text((50,800+a), word, font=font, fill=(255, 255, 255))
-                        ImgFont.getmask(word, font)
-                    else:
-                        draw.text((50,800+a+j*70), word, font=font, fill=(255, 255, 255))
-                        ImgFont.getmask(word, font)
-        im.save(output_path)
+    # def create_frame(image_path, output_path, subtitle_text):
+    #     title_font = ImgFont.truetype("segoeuib.ttf", 90)
+    #     font = ImgFont.truetype("segoeuib.ttf", 60)
+    #     im = Img.open(image_path)
+    #     draw = ImgDraw.Draw(im)
+    #     subtitle_lines = subtitle_text.split('.')
+    #     a = 0
+    #     for i, lines in enumerate(subtitle_lines):
+    #         line = lines.strip().split(' ')
+    #         for j, word in enumerate(line):
+    #             if i==0:
+    #                 draw.text((50,640+j*120), word, font=title_font, fill=(255, 255, 255))
+    #                 a = j*120
+    #                 ImgFont.getmask(word, title_font)
+    #             else:
+    #                 if j==0:
+    #                     draw.text((50,800+a), word, font=font, fill=(255, 255, 255))
+    #                     ImgFont.getmask(word, font)
+    #                 else:
+    #                     draw.text((50,800+a+j*70), word, font=font, fill=(255, 255, 255))
+    #                     ImgFont.getmask(word, font)
+    #     im.save(output_path)
 
+    # def get_pexels_images(save_path, api_key, query = "Snow", per_page=2):
+    #     base_url = "https://api.pexels.com/v1/search"
+    #     headers = {"Authorization": api_key}
+    #     params = {"query": query, "per_page": per_page}
 
-    def create_image_with_text(image_path, output_path, subtitle_text, font_size=70, font_color='white', font_name='Arial', text_position='center'):
-        # Загружаем изображение
-        img_clip = ImageClip(image_path)
+    #     response = requests.get(base_url, headers=headers, params=params)
 
-        # Создаем текстовый клип
-        text_clip = TextClip(
-            subtitle_text,
-            fontsize=font_size,
-            color=font_color,
-            font=font_name
-        )
+    #     if response.status_code == 200:
+    #         data = response.json()
+    #         photos = data.get("photos", [])
 
-        # Позиционируем текст в соответствии с заданными координатами
-        text_clip = text_clip.set_position(text_position)
+    #         for index, photo in enumerate(photos, start=1):
+    #             photo_url = photo.get("src", {}).get("original")
+    #             image_data = requests.get(photo_url).content
 
-        # Создаем видеоклип, состоящий из изображения и текста
-        final_clip = CompositeVideoClip([img_clip, text_clip]).set_duration(0.05)
+    #             image = Image.open(BytesIO(image_data))
+    #             image.save(f"{save_path}/image_{index}.jpg")
 
-        final_clip.write_videofile(output_path, codec='libx264', audio=False, fps=1)
+    #             print(f"Image {index} saved successfully")
 
-        return final_clip
-
-    def get_pexels_images(save_path, api_key, query = "Snow", per_page=2):
-        base_url = "https://api.pexels.com/v1/search"
-        headers = {"Authorization": api_key}
-        params = {"query": query, "per_page": per_page}
-
-        response = requests.get(base_url, headers=headers, params=params)
-
-        if response.status_code == 200:
-            data = response.json()
-            photos = data.get("photos", [])
-
-            for index, photo in enumerate(photos, start=1):
-                photo_url = photo.get("src", {}).get("original")
-                image_data = requests.get(photo_url).content
-
-                image = Image.open(BytesIO(image_data))
-                image.save(f"{save_path}/image_{index}.jpg")
-
-                print(f"Image {index} saved successfully")
-
-        else:
-            print(f"Failed to retrieve images. Status code: {response.status_code}")
-        os.makedirs(save_path, exist_ok=True)
+    #     else:
+    #         print(f"Failed to retrieve images. Status code: {response.status_code}")
+    #     os.makedirs(save_path, exist_ok=True)
 
 
 

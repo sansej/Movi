@@ -74,7 +74,7 @@ class VideoEditor:
                 cropped_clip.close()
                 return
             
-    def chromoKey(input_path, output_path, start_frame, end_frame, chromo_path='mrSim.mp4'):
+    def chromoKey(input_path, output_path, start_frame=None, end_frame=None, chromo_path='mrSim.mp4'):
         lower_green = np.array([40, 50, 50]) # Определение диапазона цветов хромакея (зеленого фона)
         upper_green = np.array([90, 255, 255])
         cap_chromakey = cv2.VideoCapture(chromo_path)
@@ -84,8 +84,8 @@ class VideoEditor:
         fps = int(cap_chromakey.get(5))
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # Используйте 'mp4v' для кодирования в MP4
         out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
-        start_frame = 100 # Определение начального и конечного кадра для применения хромакея
-        end_frame = 200
+        start_frame = 100#round(50*fps) # Определение начального и конечного кадра для применения хромакея
+        end_frame = 300#round(58*fps)
         frame_number = 0
         while cap_chromakey.isOpened() and cap_background.isOpened():
             ret_chromakey, frame_chromakey = cap_chromakey.read()

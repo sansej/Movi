@@ -21,26 +21,26 @@ class AudioEditor:
         so = sound.speedup(playback_speed = speed)
         so.export(output_path, format = format)
 
-    def to_subtitle_file(audio_file_path, subtitle_file, text):
-        """
-        creates subtitles from an audio file
+    # def to_subtitle_file(audio_file_path, subtitle_file, text):
+    #     """
+    #     creates subtitles from an audio file
 
-        audio_file_path - path to audio file ``*.MP3`` ``*.WAV``
+    #     audio_file_path - path to audio file ``*.MP3`` ``*.WAV``
 
-        subtitle_file - sub file path ``*.SRT``
+    #     subtitle_file - sub file path ``*.SRT``
 
-        text
-        """
-        srt = []
-        segments = detect_segments(audio_file_path)
-        result = SubtitleEditor.split_text(text, len(segments))
-        with open(subtitle_file, 'w', encoding='UTF-8') as f:
-            for i, (segment, part_text) in enumerate(zip(segments, result), start=1):
-                f.write(f"{i}\n")
-                f.write(f"{segment[0]} --> {segment[1]}\n")
-                f.write(f"{part_text}\n\n")
-                srt.append((segment[0], segment[1], part_text))
-        return srt
+    #     text
+    #     """
+    #     srt = []
+    #     segments = detect_segments(audio_file_path)
+    #     result = SubtitleEditor.split_text(text, len(segments))
+    #     with open(subtitle_file, 'w', encoding='UTF-8') as f:
+    #         for i, (segment, part_text) in enumerate(zip(segments, result), start=1):
+    #             f.write(f"{i}\n")
+    #             f.write(f"{segment[0]} --> {segment[1]}\n")
+    #             f.write(f"{part_text}\n\n")
+    #             srt.append((segment[0], segment[1], part_text))
+    #     return srt
     
     def to_subtitle(audio_file_path, text):
         """
