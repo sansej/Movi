@@ -109,7 +109,7 @@ def create_shorts_ru():
                     if os.path.exists(f'{folder_video}\\{file_name[0]}.mp4'):
                         print(f"File {folder_video}\\{file_name[0]}.mp4 found in the folder.")
                     else:
-                        ImageEditor.ken_burns_effect_video(image_path=f'{folter_image_crop}\\{file}', output_path=f'{folder_video}\\{file_name[0]}.mp4', duration=5, reverse=rev)
+                        ImageEditor.ken_burns_effect_video(image_path=f'{folter_image_crop}\\{file}', output_path=f'{folder_video}\\{file_name[0]}.mp4', duration=4, reverse=rev)
                     count += 1
         except:
             exit('Error: Failed to create video')
@@ -127,7 +127,7 @@ def create_shorts_ru():
                 if os.path.exists(f"{folder_video}\\1-{i}.mp4"):
                     print(f"File {folder_video}\\1-{i}.mp4 found in the folder.")
                 else:
-                    result_clip = VideoEditor.create_transition([clip1, clip2],overlap=0.6)
+                    result_clip = VideoEditor.create_transition([clip1, clip2],overlap=0.55)
                     result_clip.write_videofile(f"{folder_video}\\1-{i}.mp4", codec="libx264", audio_codec=None)
                     result_clip.close()
                 clip1.close()
@@ -141,15 +141,24 @@ def create_shorts_ru():
                 print(f"File 1-14_crop.mp4 found in the folder.")
             else:
                 VideoEditor.crop(video_path=f'{folder_video}\\1-14.mp4', output_path= f'{folder_video}\\1-14_crop.mp4', audio_path = audio_file)
-                print('Создан фай 1-14_crop.mp4')
+                print('Создан файл 1-14_crop.mp4')
         except:
             exit(f'Error: Failed to crop video 1-14_crop.mp4')
+        
+        try:
+            if os.path.exists(f'video\\{CLIP_NAME}\\chromo_{CLIP_NAME}_ru.mp4'):
+                print(f"File chromo_{CLIP_NAME}_ru.mp4 found in the folder.")
+            else:
+                VideoEditor.chromoKey(input_path=f'{folder_video}\\1-14_crop.mp4', output_path=f'video\\{CLIP_NAME}\\chromo_{CLIP_NAME}_ru.mp4')
+                print('Создано видео с хромакеем')
+        except:
+            exit('Ошибка создания видео с хромакеем!')
 
         try:
             if os.path.exists(video_sound):
                 print(f"File {video_sound} found in the folder.")
             else:
-                video = f"{folder_video}\\1-14_crop.mp4"
+                video = f'video\\{CLIP_NAME}\\chromo_{CLIP_NAME}_ru.mp4'
                 result_clip = VideoEditor.combinate(audio_path=audio_file,video_path=video,output_path=video_sound)
                 print(f'Создан файл video_sound_{CLIP_NAME}.mp4')
         except:
@@ -179,13 +188,16 @@ def create_shorts_ru():
             exit('Ошибка создания видео с субтитрами!')
 
         try:
-            video1 = VideoFileClip(f'video\\{CLIP_NAME}\\{CLIP_NAME}_ru.mp4')
-            video2 = VideoFileClip(f'video\\{CLIP_NAME}\\sub_video_{CLIP_NAME}_ru.mp4')
-            final_clip = concatenate_videoclips([video1, video2])
-            final_clip.write_videofile(f'video\\{CLIP_NAME}\\main_frame_ru.mp4', codec="libx264", audio_codec="aac")
-            video1.close()
-            video2.close()
-            print(f'Создано видео с заставкой main_frame_ru.mp4')
+            if os.path.exists(f'video\\{CLIP_NAME}\\main_frame_ru.mp4'):
+                print(f"File main_frame_ru.mp4 found in the folder.")
+            else:
+                video1 = VideoFileClip(f'video\\{CLIP_NAME}\\{CLIP_NAME}_ru.mp4')
+                video2 = VideoFileClip(f'{folder_video}\\sub_video_{CLIP_NAME}_ru.mp4')
+                final_clip = concatenate_videoclips([video1, video2])
+                final_clip.write_videofile(f'video\\{CLIP_NAME}\\main_frame_ru.mp4', codec="libx264", audio_codec="aac")
+                video1.close()
+                video2.close()
+                print(f'Создано видео с заставкой main_frame_ru.mp4')
         except:
             exit('Ошибка обьединения Заставки с видео!')
 
@@ -234,12 +246,21 @@ def create_shorts_en():
             print(f"File 1-14_crop.mp4 not found in the folder.")
     except:
         exit(f'Error: Failed to crop video 1-14.mp4')
+
+    try:
+        if os.path.exists(f'video\\{CLIP_NAME}\\chromo_{CLIP_NAME}_en.mp4'):
+            print(f"File chromo_{CLIP_NAME}_en.mp4 found in the folder.")
+        else:
+            VideoEditor.chromoKey(input_path=f'{folder_video}\\1-14_crop_en.mp4', output_path=f'video\\{CLIP_NAME}\\chromo_{CLIP_NAME}_en.mp4')
+            print('Создано видео с хромакеем')
+    except:
+            exit('Ошибка создания видео с хромакеем!')
     
     try:
         if os.path.exists(video_sound):
             print(f"File {video_sound} found in the folder.")
         else:
-            video = f"{folder_video}\\1-14_crop_en.mp4"
+            video = f'video\\{CLIP_NAME}\\chromo_{CLIP_NAME}_en.mp4'
             result_clip = VideoEditor.combinate(audio_path=audio_file,video_path=video,output_path=video_sound)
             print(f'Создано видео со звуком {video_sound}')
     except:
@@ -315,8 +336,8 @@ def make_frame_ru(t):
 def main():
     start_time = time.time()
 
-    # create_shorts_ru()
-    create_shorts_en()
+    create_shorts_ru()
+    # create_shorts_en()
 
 
     # len = len_simbols('text\\SolarSystemPlanets_ru.txt')
@@ -324,7 +345,6 @@ def main():
     # clip = AudioFileClip('audio\\voice_Mars_ru.mp3').duration
     # print(clip)
 
-    # chromoKey()
 
     # VideoEditor.chromoKey(input_path='video\\Mars\\1-14_crop.mp4', output_path='video\\Mars\\chromo.mp4')
 

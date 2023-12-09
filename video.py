@@ -3,6 +3,8 @@ from audio import AudioEditor
 from subtitle import SubtitleEditor
 import cv2
 import numpy as np
+import shutil
+import os
 
 class VideoEditor:
 
@@ -61,7 +63,10 @@ class VideoEditor:
                 audio_clip.close()
                 return
             else:
+                shutil.copy(video_path, output_path)
                 return
+                # # Переименование скопированного файла
+                # os.rename(новое_имя, новое_имя)
         
         if duration:
             if video_clip.duration<=duration:
@@ -74,39 +79,87 @@ class VideoEditor:
                 cropped_clip.close()
                 return
             
-    def chromoKey(input_path, output_path, start_frame=None, end_frame=None, chromo_path='mrSim.mp4'):
+    def chromoKey(input_path, output_path, start_time=35, chromakey_duration=10, chromo_path='mrSim.mp4'):
         lower_green = np.array([40, 50, 50]) # Определение диапазона цветов хромакея (зеленого фона)
         upper_green = np.array([90, 255, 255])
         cap_chromakey = cv2.VideoCapture(chromo_path)
         cap_background = cv2.VideoCapture(input_path)       
-        width = int(cap_chromakey.get(3))# Определение параметров видео (ширина, высота и частота кадров)
+
+        # Определение параметров видео (ширина, высота и частота кадров)
+        width = int(cap_chromakey.get(3))
         height = int(cap_chromakey.get(4))
         fps = int(cap_chromakey.get(5))
+
+        # Определение кодека и создание объекта VideoWriter
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # Используйте 'mp4v' для кодирования в MP4
         out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
-        start_frame = 100#round(50*fps) # Определение начального и конечного кадра для применения хромакея
-        end_frame = 300#round(58*fps)
+
+        # Определение времени для применения хромакея в секундах
+        chromakey_start_time_seconds = start_time  # время начала хромакея в секундах
+
+        # Перевод времени из секунд в кадры
+        chromakey_start_frame = int(chromakey_start_time_seconds * fps)
+
+        # Определение длительности видео с хромакеем
+        chromakey_duration_seconds = chromakey_duration  # длительность хромакея в секундах
+        chromakey_duration_frames = int(chromakey_duration_seconds * fps)
+
         frame_number = 0
-        while cap_chromakey.isOpened() and cap_background.isOpened():
-            ret_chromakey, frame_chromakey = cap_chromakey.read()
+        print('Создаю видео с хромакеем. Ждите...')
+
+        while cap_background.isOpened():
             ret_background, frame_background = cap_background.read()
-            if not ret_chromakey or not ret_background:
+
+            if not ret_background:
                 break
-            hsv = cv2.cvtColor(frame_chromakey, cv2.COLOR_BGR2HSV)
-            mask = cv2.inRange(hsv, lower_green, upper_green)
-            inverted_mask = cv2.bitwise_not(mask)
-            chromakey_result = cv2.bitwise_and(frame_chromakey, frame_chromakey, mask=inverted_mask)
-            background_result = cv2.bitwise_and(frame_background, frame_background, mask=mask)
-            chromakey_result = cv2.resize(chromakey_result, (width, height))
-            if start_frame <= frame_number <= end_frame:
+
+            # Применение маски к заднему фону
+            background_result = frame_background.copy()
+
+            # Случай, когда нужно применить хромакей
+            if chromakey_start_frame <= frame_number < chromakey_start_frame + chromakey_duration_frames:
+                ret_chromakey, frame_chromakey = cap_chromakey.read()
+
+                if not ret_chromakey:
+                    break
+
+                # Преобразование изображения в цветовое пространство HSV
+                hsv = cv2.cvtColor(frame_chromakey, cv2.COLOR_BGR2HSV)
+
+                # Создание маски хромакея
+                mask = cv2.inRange(hsv, lower_green, upper_green)
+
+                # Инвертирование маски
+                inverted_mask = cv2.bitwise_not(mask)
+
+                # Применение инвертированной маски к кадру хромакея
+                chromakey_result = cv2.bitwise_and(frame_chromakey, frame_chromakey, mask=inverted_mask)
+
+                # Изменение размеров кадра хромакея
+                chromakey_result = cv2.resize(chromakey_result, (width, height))
+
+                # Сложение двух кадров
                 result = cv2.addWeighted(chromakey_result, 1, background_result, 1, 0, dtype=cv2.CV_8U)
+
+                # Запись обработанного кадра в видеофайл
+                out.write(result)
+
+                # Отображение результата
+                # cv2.imshow('With Background Chromakey', result)
+
             else:
-                result = frame_background
-            out.write(result)
-            # cv2.imshow('With Background Chromakey', result)# Отображение результата
+                # В этом случае, если время для хромакея еще не наступило
+                # или оно уже прошло, просто записываем фоновый кадр
+                out.write(background_result)
+
+                # Отображение результата
+                # cv2.imshow('With Background Chromakey', background_result)
+
             # if cv2.waitKey(25) & 0xFF == ord('q'):
             #     break
+
             frame_number += 1
+
         cap_chromakey.release()
         cap_background.release()
         out.release()
