@@ -17,8 +17,12 @@ class SubtitleEditor:
         subtitle_clips = []
         change_settings({"IMAGEMAGICK_BINARY": r"C:\\Program Files\\ImageMagick-7.1.1-Q16\\magick.exe"})
         for subtitle in subtitles:
-            start_time = time_to_seconds(subtitle[0])
-            end_time = time_to_seconds(subtitle[1])
+            if isinstance(subtitle[0], float) or isinstance(subtitle[0], int):
+                start_time = subtitle[0]
+                end_time = subtitle[1]
+            else:
+                start_time = time_to_seconds(subtitle[0])
+                end_time = time_to_seconds(subtitle[1])
             duration = end_time - start_time
             video_width, video_height = videosize
             text_clip = TextClip(subtitle[2], fontsize=fontsize, font=font, color=color, bg_color=background, stroke_color=stroke_color, stroke_width=stroke_width,size=(video_width*3/4, None), method='caption').set_start(start_time).set_duration(duration)

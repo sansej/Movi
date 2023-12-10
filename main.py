@@ -3,13 +3,14 @@ from subtitle import SubtitleEditor, len_simbols
 from video import VideoEditor, AudioFileClip
 from image import ImageEditor
 from youtube import post_shorts
+import speech_recognition as sr
 import os 
 from moviepy.editor import VideoFileClip, VideoClip, ImageClip, CompositeVideoClip, TextClip, concatenate_videoclips
 # from moviepy.video.compositing.concatenate import concatenate_videoclips
 from moviepy.config import change_settings
 change_settings({"IMAGEMAGICK_BINARY": r"C:\\Program Files\\ImageMagick-7.1.1-Q16\\magick.exe"})
 # import pyttsx3
-from pydub import AudioSegment
+from pydub import AudioSegment, silence
 from vosk import Model, KaldiRecognizer
 import fnmatch
 import wave
@@ -334,30 +335,76 @@ def make_frame_ru(t):
     video_clip = video_clip.set_duration(10)  # Установите нужную продолжительность
     return video_clip.get_frame(t)
 
-def process_audio_file(audio_file_path):
-    # Получение текста из аудио файла
-    audio_text = 'в этот период аврора может проявляться в виде круговых образов, называемых "Кольца Кроули". Полярные сияния весной и о́сенью возникают заметно чаще'
-    if audio_text is not None:
-        # Получение длительности аудио файла
-        audio = AudioSegment.from_file(audio_file_path, format="mp3")
-        audio_duration = len(audio) / 1000  # преобразование миллисекунд в секунды
-        # Извлечение времени начала и конца каждого слова
-        word_timings = extract_word_timings(audio_text, audio_duration)
-        return word_timings
-    return None
+# def transcribe_audio(file_path):
+#     recognizer = sr.Recognizer()
 
-def extract_word_timings(audio_text, audio_duration):
+#     # Загрузка аудио файла
+#     audio = AudioSegment.from_file(file_path, format="mp3")
+
+#     # Сохранение аудио во временный WAV-файл
+#     temp_wav_file = "temp_audio.wav"
+#     audio.export(temp_wav_file, format="wav")
+
+#     # Преобразование временного WAV-файла в текст
+#     with sr.AudioFile(temp_wav_file) as source:
+#         audio_text = recognizer.record(source)
+
+#     try:
+#         text = recognizer.recognize_google(audio_text, language="ru-RU")
+#         return text
+#     except sr.UnknownValueError:
+#         print("Речь не распознана")
+#         return None
+#     except sr.RequestError as e:
+#         print(f"Ошибка сервиса распознавания речи: {e}")
+#         return None
+
+def extract_word_timings(audio_text, audio_file_path):
     # Определение времени начала и конца каждого слова на основе текста и длительности аудио
+
+    # Получение времени молчания (пауз) в аудио
+    audio = AudioSegment.from_file(audio_file_path, format="mp3")
+    audio_duration = len(audio) / 1000  # преобразование миллисекунд в секунды
+    # Сохранение аудио во временный WAV-файл
+    # temp_wav_file = "temp_audio.wav"
+    # audio.export(temp_wav_file, format="wav")
+    # recognizer = sr.Recognizer()
+
+    silent_ranges = silence.detect_silence(audio, min_silence_len=530, silence_thresh=-40)
+
+    # Перевод в миллисекунды
+    silent_ranges = [(start / 1000, stop / 1000) for start, stop in silent_ranges]
+    print(silent_ranges)
+
+    tim = 0
+    for item in silent_ranges:
+        tim = tim + item[1]-item[0]
+    print(tim)
     word_timings = []
     words = audio_text.split()
+
     word_start = 0
     word_end = 0
+
     for word in words:
         word_duration = len(word) / len(audio_text) * audio_duration
         word_end = word_start + word_duration
         word_timings.append({"word": word, "start": word_start, "end": word_end})
-        word_start = word_end
+        word_start = word_end + tim/(len(words)-1)
+
     return word_timings
+
+def process_audio_file(audio_file_path):
+    # Получение текста из аудио файла
+    text = 'Северное сияние или аврора — атмосферное оптическое явление, свечение верхних слоёв атмосферы, возникающее вследствие взаимодействия магнитосферы Земли с заряженными частицами солнечного ветра. Спектр полярного сияния зависит от состава атмосферы. Для Земли наиболее яркими являются линии излучения возбуждённых атомов кислорода и азота в видимом диапазоне. Интенсивность северного сияния зависит от солнечного цикла, который длится около 11 лет. В пике солнечной активности аврора может быть более яркой и чаще встречаться, в этот период аврора может проявляться в виде круговых образов, называемых "Кольца Кроули". Полярные сияния весной и осенью возникают заметно чаще, чем зимой и летом. Пик частотности приходится на периоды, ближайшие к весеннему и осеннему равноденствиям.'
+    audio_text = text
+
+    if audio_text is not None:
+        # Извлечение времени начала и конца каждого слова
+        word_timings = extract_word_timings(audio_text, audio_file_path)
+        return word_timings
+
+    return None
 
 def main():
     start_time = time.time()
@@ -371,11 +418,25 @@ def main():
     # clip = AudioFileClip('audio\\voice_Aurora_ru.mp3').duration
     # print(clip)
 
-    audio_file_path = "test.mp3"
+    # VideoEditor.combinate(audio_path='audio\\voice_Aurora_ru.mp3',video_path='video\\Aurora\\1-14_crop.mp4',output_path='test.mp4')
+    audio_file_path = "audio\\voice_Aurora_ru.mp3"
     result = process_audio_file(audio_file_path)
+    sub=[]
     if result is not None:
         for item in result:
-            print(f"Слово: {item['word']}, Начало: {item['start']:.2f} сек., Конец: {item['end']:.2f} сек.")
+            sub.append((item['start'],item['end'],item['word']))
+    print(sub)
+    # sub = AudioEditor.to_subtitle(audio_file_path='test.mp3', text=text)
+    sub_clip = SubtitleEditor.create_subtitle_clips(sub,(720,1280),fontsize=70, stroke_color='black', font='Arial-Rounded-MT-Bold')
+    clip = VideoFileClip('test.mp4')
+    result_clip = VideoEditor.create_transition([clip],sub_clip,overlap=0.5)
+    result_clip.write_videofile('final.mp4', codec="libx264", audio_codec=None, fps=30)
+
+    # audio_file_path = "test.mp3"
+    # result = process_audio_file(audio_file_path)
+    # if result is not None:
+    #     for item in result:
+    #         print(f"Слово: {item['word']}, Начало: {item['start']:.2f} сек., Конец: {item['end']:.2f} сек.")
 
 
     end_time = time.time()
