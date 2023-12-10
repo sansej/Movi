@@ -10,6 +10,7 @@ from moviepy.config import change_settings
 change_settings({"IMAGEMAGICK_BINARY": r"C:\\Program Files\\ImageMagick-7.1.1-Q16\\magick.exe"})
 # import pyttsx3
 from pydub import AudioSegment
+from vosk import Model, KaldiRecognizer
 import fnmatch
 import wave
 import numpy as np
@@ -18,8 +19,8 @@ from PIL import Image
 import cv2
 key = 'MVsaiNhymA81LvKqS9oezJeEpyZ2pYDtq9zFFQvnuWPwCMPmhiOLaI88'
 
-CLIP_NAME = 'Mars'
-CLIP_NAME_RU = "Марс"
+CLIP_NAME = 'Aurora'
+CLIP_NAME_RU = "Северное\nсияние"
 SECOND_FRAME_RU = "Интересные факты"
 SECOND_FRAME_EN = 'Interesting Facts'
 
@@ -93,7 +94,7 @@ def create_shorts_ru():
 
         try:
             video = VideoClip(make_frame=make_frame_ru, duration=0.1)
-            video.write_videofile(f'video\\{CLIP_NAME}\\{CLIP_NAME}_ru.mp4', fps=24, codec="libx264")
+            video.write_videofile(f'video\\{CLIP_NAME}\\{CLIP_NAME}_ru.mp4', fps=30, codec="libx264")
         except:
             print('Ошибка создания Заставки!')
 
@@ -109,7 +110,7 @@ def create_shorts_ru():
                     if os.path.exists(f'{folder_video}\\{file_name[0]}.mp4'):
                         print(f"File {folder_video}\\{file_name[0]}.mp4 found in the folder.")
                     else:
-                        ImageEditor.ken_burns_effect_video(image_path=f'{folter_image_crop}\\{file}', output_path=f'{folder_video}\\{file_name[0]}.mp4', duration=4, reverse=rev)
+                        ImageEditor.ken_burns_effect_video(image_path=f'{folter_image_crop}\\{file}', output_path=f'{folder_video}\\{file_name[0]}.mp4', duration=5, reverse=rev)
                     count += 1
         except:
             exit('Error: Failed to create video')
@@ -127,8 +128,8 @@ def create_shorts_ru():
                 if os.path.exists(f"{folder_video}\\1-{i}.mp4"):
                     print(f"File {folder_video}\\1-{i}.mp4 found in the folder.")
                 else:
-                    result_clip = VideoEditor.create_transition([clip1, clip2],overlap=0.55)
-                    result_clip.write_videofile(f"{folder_video}\\1-{i}.mp4", codec="libx264", audio_codec=None)
+                    result_clip = VideoEditor.create_transition([clip1, clip2],overlap=0.5)
+                    result_clip.write_videofile(f"{folder_video}\\1-{i}.mp4", codec="libx264", audio_codec=None, fps=30)
                     result_clip.close()
                 clip1.close()
                 clip2.close()
@@ -180,7 +181,7 @@ def create_shorts_ru():
             else:
                 clip = VideoFileClip(video_sound)
                 result_clip = VideoEditor.create_transition([clip],sub_clip,overlap=0.5)
-                result_clip.write_videofile(f'{folder_video}\\sub_video_{CLIP_NAME}_ru.mp4', codec="libx264", audio_codec=None)
+                result_clip.write_videofile(f'{folder_video}\\sub_video_{CLIP_NAME}_ru.mp4', codec="libx264", audio_codec=None, fps=30)
                 clip.close()
                 result_clip.close()
                 print(f'Создано видео с субтитрами sub_video_{CLIP_NAME}_ru.mp4')
@@ -194,7 +195,7 @@ def create_shorts_ru():
                 video1 = VideoFileClip(f'video\\{CLIP_NAME}\\{CLIP_NAME}_ru.mp4')
                 video2 = VideoFileClip(f'{folder_video}\\sub_video_{CLIP_NAME}_ru.mp4')
                 final_clip = concatenate_videoclips([video1, video2])
-                final_clip.write_videofile(f'video\\{CLIP_NAME}\\main_frame_ru.mp4', codec="libx264", audio_codec="aac")
+                final_clip.write_videofile(f'video\\{CLIP_NAME}\\main_frame_ru.mp4', codec="libx264", audio_codec="aac", fps=30)
                 video1.close()
                 video2.close()
                 print(f'Создано видео с заставкой main_frame_ru.mp4')
@@ -333,22 +334,48 @@ def make_frame_ru(t):
     video_clip = video_clip.set_duration(10)  # Установите нужную продолжительность
     return video_clip.get_frame(t)
 
+def process_audio_file(audio_file_path):
+    # Получение текста из аудио файла
+    audio_text = 'в этот период аврора может проявляться в виде круговых образов, называемых "Кольца Кроули". Полярные сияния весной и о́сенью возникают заметно чаще'
+    if audio_text is not None:
+        # Получение длительности аудио файла
+        audio = AudioSegment.from_file(audio_file_path, format="mp3")
+        audio_duration = len(audio) / 1000  # преобразование миллисекунд в секунды
+        # Извлечение времени начала и конца каждого слова
+        word_timings = extract_word_timings(audio_text, audio_duration)
+        return word_timings
+    return None
+
+def extract_word_timings(audio_text, audio_duration):
+    # Определение времени начала и конца каждого слова на основе текста и длительности аудио
+    word_timings = []
+    words = audio_text.split()
+    word_start = 0
+    word_end = 0
+    for word in words:
+        word_duration = len(word) / len(audio_text) * audio_duration
+        word_end = word_start + word_duration
+        word_timings.append({"word": word, "start": word_start, "end": word_end})
+        word_start = word_end
+    return word_timings
+
 def main():
     start_time = time.time()
 
-    create_shorts_ru()
+    # create_shorts_ru()
     # create_shorts_en()
 
 
-    # len = len_simbols('text\\SolarSystemPlanets_ru.txt')
+    # len = len_simbols('text\\Aurora_ru.txt')
     # print(len)
-    # clip = AudioFileClip('audio\\voice_Mars_ru.mp3').duration
+    # clip = AudioFileClip('audio\\voice_Aurora_ru.mp3').duration
     # print(clip)
 
-
-    # VideoEditor.chromoKey(input_path='video\\Mars\\1-14_crop.mp4', output_path='video\\Mars\\chromo.mp4')
-
-
+    audio_file_path = "test.mp3"
+    result = process_audio_file(audio_file_path)
+    if result is not None:
+        for item in result:
+            print(f"Слово: {item['word']}, Начало: {item['start']:.2f} сек., Конец: {item['end']:.2f} сек.")
 
 
     end_time = time.time()
@@ -356,8 +383,8 @@ def main():
     print(f"Время выполнения: {execution_time/60} минут")
 
     # ImageEditor.get_pexels_images(api_key=key,save_path=f'image\\{CLIP_NAME}')
-
-
+    'в этот период аврора может проявляться в виде круговых образов, называемых "Кольца Кроули". Полярные сияния весной и о́сенью возникают заметно чаще'
+  
 
 
 if __name__ == "__main__":
