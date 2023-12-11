@@ -95,7 +95,7 @@ def create_shorts_ru():
 
         try:
             video = VideoClip(make_frame=make_frame_ru, duration=0.1)
-            video.write_videofile(f'video\\{CLIP_NAME}\\{CLIP_NAME}_ru.mp4', fps=30, codec="libx264")
+            video.write_videofile(f'video\\{CLIP_NAME}\\frame_{CLIP_NAME}_ru.mp4', fps=30, codec="libx264")
         except:
             print('Ошибка создания Заставки!')
 
@@ -190,27 +190,27 @@ def create_shorts_ru():
             exit('Ошибка создания видео с субтитрами!')
 
         try:
-            if os.path.exists(f'video\\{CLIP_NAME}\\main_frame_ru.mp4'):
+            if os.path.exists(f'video\\{CLIP_NAME}\\{CLIP_NAME}_ru.mp4'):
                 print(f"File main_frame_ru.mp4 found in the folder.")
             else:
-                video1 = VideoFileClip(f'video\\{CLIP_NAME}\\{CLIP_NAME}_ru.mp4')
+                video1 = VideoFileClip(f'video\\{CLIP_NAME}\\frame_{CLIP_NAME}_ru.mp4')
                 video2 = VideoFileClip(f'{folder_video}\\sub_video_{CLIP_NAME}_ru.mp4')
                 final_clip = concatenate_videoclips([video1, video2])
-                final_clip.write_videofile(f'video\\{CLIP_NAME}\\main_frame_ru.mp4', codec="libx264", audio_codec="aac", fps=30)
+                final_clip.write_videofile(f'video\\{CLIP_NAME}\\{CLIP_NAME}_ru.mp4', codec="libx264", audio_codec="aac", fps=30)
                 video1.close()
                 video2.close()
-                print(f'Создано видео с заставкой main_frame_ru.mp4')
+                print(f'Создано видео с заставкой {CLIP_NAME}_ru.mp4')
         except:
             exit('Ошибка обьединения Заставки с видео!')
 
         try:
-            if os.path.exists(f'{folder_video}\\final_video_{CLIP_NAME}_ru.mp4'):
-                print(f"File final_video_{CLIP_NAME}_ru.mp4 found in the folder.")
+            if os.path.exists(f'{folder_video}\\final_{CLIP_NAME}_ru.mp4'):
+                print(f"File final_{CLIP_NAME}_ru.mp4 found in the folder.")
             else:
-                VideoEditor.crop(video_path=f'video\\{CLIP_NAME}\\main_frame_ru.mp4', output_path= f'{folder_video}\\final_video_{CLIP_NAME}_ru.mp4')
-                print(f'Создано финальное видео final_video_{CLIP_NAME}_ru.mp4')
+                VideoEditor.crop(video_path=f'video\\{CLIP_NAME}\\{CLIP_NAME}_ru.mp4', output_path= f'{folder_video}\\final_{CLIP_NAME}_ru.mp4')
+                print(f'Создано финальное видео final_{CLIP_NAME}_ru.mp4')
         except:
-            exit(f'Ошибка создания финального видео final_video_{CLIP_NAME}_ru.mp4!')
+            exit(f'Ошибка создания финального видео final_{CLIP_NAME}_ru.mp4!')
         print('Successfully!')
 
 def create_shorts_en():
@@ -236,7 +236,7 @@ def create_shorts_en():
 
     try:
         video = VideoClip(make_frame=make_frame_en, duration=0.1)
-        video.write_videofile(f'video\\{CLIP_NAME}\\{CLIP_NAME}_en.mp4', fps=24, codec="libx264")
+        video.write_videofile(f'video\\{CLIP_NAME}\\frame_{CLIP_NAME}_en.mp4', fps=24, codec="libx264")
     except:
         exit('Ошибка создания Заставки!')
 
@@ -292,24 +292,24 @@ def create_shorts_en():
         exit('Error: Failed to create video final_video_en.mp4')
 
     try:
-        video1 = VideoFileClip(f'video\\{CLIP_NAME}\\{CLIP_NAME}_en.mp4')
+        video1 = VideoFileClip(f'video\\{CLIP_NAME}\\frame_{CLIP_NAME}_en.mp4')
         video2 = VideoFileClip(f'video\\{CLIP_NAME}\\sub_video_{CLIP_NAME}_en.mp4')
         final_clip = concatenate_videoclips([video1, video2])
-        final_clip.write_videofile(f'video\\{CLIP_NAME}\\main_frame_en.mp4', codec="libx264", audio_codec="aac")
+        final_clip.write_videofile(f'video\\{CLIP_NAME}\\{CLIP_NAME}_en.mp4', codec="libx264", audio_codec="aac")
         video1.close()
         video2.close()
-        print(f'Создано видео с заставкой main_frame_en.mp4')
+        print(f'Создано видео с заставкой {CLIP_NAME}_en.mp4')
     except:
         exit('Ошибка обьединения Заставки с видео!')
 
     try:
-        if os.path.exists(f'{folder_video}\\final_video_{CLIP_NAME}_en.mp4'):
-            print(f"File final_video_{CLIP_NAME}_en.mp4 found in the folder.")
+        if os.path.exists(f'{folder_video}\\final_{CLIP_NAME}_en.mp4'):
+            print(f"File final_{CLIP_NAME}_en.mp4 found in the folder.")
         else:
-            VideoEditor.crop(video_path=f'video\\{CLIP_NAME}\\main_frame_en.mp4', output_path= f'{folder_video}\\final_video_{CLIP_NAME}_en.mp4')
-            print(f'Создано финальное видео final_video_{CLIP_NAME}_en.mp4')
+            VideoEditor.crop(video_path=f'video\\{CLIP_NAME}\\{CLIP_NAME}_en.mp4', output_path= f'{folder_video}\\final_{CLIP_NAME}_en.mp4')
+            print(f'Создано финальное видео final_{CLIP_NAME}_en.mp4')
     except:
-        exit(f'Ошибка создания финального видео final_video_{CLIP_NAME}_en.mp4!')
+        exit(f'Ошибка создания финального видео final_{CLIP_NAME}_en.mp4!')
 
     print('ОТЛИЧНАЯ РАБОТА!')
 
