@@ -3,9 +3,9 @@ from subtitle import SubtitleEditor
 import os
 import numpy as np
 from pydub import AudioSegment
-import speech_recognition as sr
+# import speech_recognition as sr
 import matplotlib.pyplot as plt
-from vosk import Model, KaldiRecognizer
+# from vosk import Model, KaldiRecognizer
 
 set_api_key(os.environ.get("ELEVEN_KEY"))
 

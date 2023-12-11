@@ -3,7 +3,7 @@ from subtitle import SubtitleEditor, len_simbols
 from video import VideoEditor, AudioFileClip
 from image import ImageEditor
 from youtube import post_shorts
-import speech_recognition as sr
+# import speech_recognition as sr
 import os 
 from moviepy.editor import VideoFileClip, VideoClip, ImageClip, CompositeVideoClip, TextClip, concatenate_videoclips
 # from moviepy.video.compositing.concatenate import concatenate_videoclips
@@ -11,7 +11,7 @@ from moviepy.config import change_settings
 change_settings({"IMAGEMAGICK_BINARY": r"C:\\Program Files\\ImageMagick-7.1.1-Q16\\magick.exe"})
 # import pyttsx3
 from pydub import AudioSegment, silence
-from vosk import Model, KaldiRecognizer
+# from vosk import Model, KaldiRecognizer
 import fnmatch
 import wave
 import numpy as np
@@ -20,8 +20,8 @@ from PIL import Image
 import cv2
 key = 'MVsaiNhymA81LvKqS9oezJeEpyZ2pYDtq9zFFQvnuWPwCMPmhiOLaI88'
 
-CLIP_NAME = 'Aurora'
-CLIP_NAME_RU = "Северное\nсияние"
+CLIP_NAME = 'Venus'
+CLIP_NAME_RU = "Венера" #для разделения слов использовать \n
 SECOND_FRAME_RU = "Интересные факты"
 SECOND_FRAME_EN = 'Interesting Facts'
 
@@ -409,28 +409,28 @@ def process_audio_file(audio_file_path):
 def main():
     start_time = time.time()
 
-    # create_shorts_ru()
-    # create_shorts_en()
+    create_shorts_ru()
+    create_shorts_en()
 
 
-    # len = len_simbols('text\\Aurora_ru.txt')
+    # len = len_simbols('text\\Venus_en.txt')
     # print(len)
     # clip = AudioFileClip('audio\\voice_Aurora_ru.mp3').duration
     # print(clip)
 
     # VideoEditor.combinate(audio_path='audio\\voice_Aurora_ru.mp3',video_path='video\\Aurora\\1-14_crop.mp4',output_path='test.mp4')
-    audio_file_path = "audio\\voice_Aurora_ru.mp3"
-    result = process_audio_file(audio_file_path)
-    sub=[]
-    if result is not None:
-        for item in result:
-            sub.append((item['start'],item['end'],item['word']))
-    print(sub)
-    # sub = AudioEditor.to_subtitle(audio_file_path='test.mp3', text=text)
-    sub_clip = SubtitleEditor.create_subtitle_clips(sub,(720,1280),fontsize=70, stroke_color='black', font='Arial-Rounded-MT-Bold')
-    clip = VideoFileClip('test.mp4')
-    result_clip = VideoEditor.create_transition([clip],sub_clip,overlap=0.5)
-    result_clip.write_videofile('final.mp4', codec="libx264", audio_codec=None, fps=30)
+    # audio_file_path = "audio\\voice_Aurora_ru.mp3"
+    # result = process_audio_file(audio_file_path)
+    # sub=[]
+    # if result is not None:
+    #     for item in result:
+    #         sub.append((item['start'],item['end'],item['word']))
+    # print(sub)
+    # # sub = AudioEditor.to_subtitle(audio_file_path='test.mp3', text=text)
+    # sub_clip = SubtitleEditor.create_subtitle_clips(sub,(720,1280),fontsize=70, stroke_color='black', font='Arial-Rounded-MT-Bold')
+    # clip = VideoFileClip('test.mp4')
+    # result_clip = VideoEditor.create_transition([clip],sub_clip,overlap=0.5)
+    # result_clip.write_videofile('final.mp4', codec="libx264", audio_codec=None, fps=30)
 
     # audio_file_path = "test.mp3"
     # result = process_audio_file(audio_file_path)
@@ -444,7 +444,6 @@ def main():
     print(f"Время выполнения: {execution_time/60} минут")
 
     # ImageEditor.get_pexels_images(api_key=key,save_path=f'image\\{CLIP_NAME}')
-    'в этот период аврора может проявляться в виде круговых образов, называемых "Кольца Кроули". Полярные сияния весной и о́сенью возникают заметно чаще'
   
 
 
