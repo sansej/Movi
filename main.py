@@ -20,8 +20,9 @@ from PIL import Image
 import cv2
 key = 'MVsaiNhymA81LvKqS9oezJeEpyZ2pYDtq9zFFQvnuWPwCMPmhiOLaI88'
 
-CLIP_NAME = 'Venus'
-CLIP_NAME_RU = "Венера" #для разделения слов использовать \n
+CLIP_NAME = 'HaughtonCrater'
+CLIP_NAME_EN = 'Haughton\nCrater'
+CLIP_NAME_RU = "Кратер\nХотон" #для разделения слов использовать \n
 SECOND_FRAME_RU = "Интересные факты"
 SECOND_FRAME_EN = 'Interesting Facts'
 
@@ -316,10 +317,10 @@ def create_shorts_en():
 def make_frame_en(t):
     image_path = f'image_crop\\{CLIP_NAME}\\1.jpg'
     image_clip = ImageClip(image_path)
-    subtitle_clip_line1 = TextClip(CLIP_NAME, fontsize=24, color='white', stroke_color='black',stroke_width=3, font='Segoe-UI-Bold', size=(image_clip.size[0]*3/4, None))
+    subtitle_clip_line1 = TextClip(CLIP_NAME_EN, fontsize=24, color='white', stroke_color='black',stroke_width=3, font='Segoe-UI-Bold', size=(image_clip.size[0]*3/4, None))
     subtitle_clip_line3 = TextClip(SECOND_FRAME_EN, fontsize=24, color='white', stroke_color='black',stroke_width=1,font='Segoe-UI-Bold', size=(image_clip.size[0]*3/4, None))
     position_line1 = ('center', 'center' )
-    position_line3 = ('center', image_clip.size[1]-500)
+    position_line3 = ('center', image_clip.size[1]-400)
     video_clip = CompositeVideoClip([image_clip, subtitle_clip_line1.set_position(position_line1).set_duration(image_clip.duration), subtitle_clip_line3.set_position(position_line3).set_duration(image_clip.duration)])
     video_clip = video_clip.set_duration(10)  # Установите нужную продолжительность
     return video_clip.get_frame(t)
@@ -330,7 +331,7 @@ def make_frame_ru(t):
     subtitle_clip_line1 = TextClip(CLIP_NAME_RU, fontsize=24, color='white', stroke_color='black',stroke_width=3, font='Segoe-UI-Bold', size=(image_clip.size[0]*3/4, None))
     subtitle_clip_line3 = TextClip(SECOND_FRAME_RU, fontsize=24, color='white', stroke_color='black',stroke_width=1,font='Segoe-UI-Bold', size=(image_clip.size[0]*3/4, None))
     position_line1 = ('center', 'center' )
-    position_line3 = ('center', image_clip.size[1]-500)
+    position_line3 = ('center', image_clip.size[1]-400)
     video_clip = CompositeVideoClip([image_clip, subtitle_clip_line1.set_position(position_line1).set_duration(image_clip.duration), subtitle_clip_line3.set_position(position_line3).set_duration(image_clip.duration)])
     video_clip = video_clip.set_duration(10)  # Установите нужную продолжительность
     return video_clip.get_frame(t)
@@ -413,7 +414,7 @@ def main():
     create_shorts_en()
 
 
-    # len = len_simbols('text\\Venus_en.txt')
+    # len = len_simbols('text\\HaughtonCrater_en.txt')
     # print(len)
     # clip = AudioFileClip('audio\\voice_Aurora_ru.mp3').duration
     # print(clip)
