@@ -21,6 +21,7 @@ import cv2
 key = 'MVsaiNhymA81LvKqS9oezJeEpyZ2pYDtq9zFFQvnuWPwCMPmhiOLaI88'
 
 CLIP_NAME = 'Venus'
+CLIP_NAME_EN = 'Venus'
 CLIP_NAME_RU = "Венера" #для разделения слов использовать \n
 SECOND_FRAME_RU = "Интересные факты"
 SECOND_FRAME_EN = 'Interesting Facts'
