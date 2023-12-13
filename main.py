@@ -20,8 +20,8 @@ from PIL import Image
 import cv2
 key = 'MVsaiNhymA81LvKqS9oezJeEpyZ2pYDtq9zFFQvnuWPwCMPmhiOLaI88'
 
-CLIP_NAME = 'Venus'
-CLIP_NAME_RU = "Венера" #для разделения слов использовать \n
+CLIP_NAME = 'Saturn'
+CLIP_NAME_RU = "Сатурн" #для разделения слов использовать \n
 SECOND_FRAME_RU = "Интересные факты"
 SECOND_FRAME_EN = 'Interesting Facts'
 
@@ -409,11 +409,11 @@ def process_audio_file(audio_file_path):
 def main():
     start_time = time.time()
 
-    create_shorts_ru()
+    create_shorts_ru() 
     create_shorts_en()
 
 
-    # len = len_simbols('text\\Venus_en.txt')
+    # len = len_simbols('text\\Saturn_en.txt')
     # print(len)
     # clip = AudioFileClip('audio\\voice_Aurora_ru.mp3').duration
     # print(clip)
