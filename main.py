@@ -20,9 +20,9 @@ from PIL import Image
 import cv2
 key = 'MVsaiNhymA81LvKqS9oezJeEpyZ2pYDtq9zFFQvnuWPwCMPmhiOLaI88'
 
-PROJECT_NAME = 'Venus'
-CLIP_NAME_EN = 'Venus'
-CLIP_NAME_RU = "Венера" #для разделения слов использовать \n
+PROJECT_NAME = 'MachuPicchu'
+CLIP_NAME_EN = 'Machu\nPicchu'
+CLIP_NAME_RU = "Мачу-\nПикчу" #для разделения слов использовать \n
 SECOND_FRAME_RU = "Интересные факты"
 SECOND_FRAME_EN = 'Interesting Facts'
 
@@ -208,7 +208,7 @@ def create_shorts_ru():
             if os.path.exists(f'{folder_video}\\final_{PROJECT_NAME}_ru.mp4'):
                 print(f"final_{PROJECT_NAME}_ru.mp4 существует")
             else:
-                VideoEditor.crop(video_path=f'{folder_video}\\{PROJECT_NAME}_ru.mp4', output_path= f'{folder_video}\\final_{PROJECT_NAME}_ru.mp4')
+                VideoEditor.crop(video_path=f'{PROJECT_NAME}\\{PROJECT_NAME}_ru.mp4', output_path= f'{PROJECT_NAME}\\final_{PROJECT_NAME}_ru.mp4')
                 print(f'Создано финальное видео final_{PROJECT_NAME}_ru.mp4')
         except:
             exit(f'Ошибка создания финального видео final_{PROJECT_NAME}_ru.mp4!')
@@ -220,6 +220,11 @@ def create_shorts_en():
     folder_video = f'{PROJECT_NAME}\\EN\\video'
     video_sound = f'{folder_video}\\video_sound_{PROJECT_NAME}_en.mp4'
 
+    if not os.path.exists(folder_video):
+            os.makedirs(folder_video)
+            print("Папка video создана")
+    else:
+        print("Папка video уже существует")
 
     try:
         with open(f'{PROJECT_NAME}\\EN\\{PROJECT_NAME}_en.txt', 'r', encoding='UTF-8') as file:
@@ -255,7 +260,7 @@ def create_shorts_en():
         if os.path.exists(f'{folder_video}\\chromo_{PROJECT_NAME}_en.mp4'):
             print(f"chromo_{PROJECT_NAME}_en.mp4 существует")
         else:
-            VideoEditor.chromoKey(input_path=f'{folder_video}\\1-14_crop_en.mp4', output_path=f'{folder_video}\\chromo_{PROJECT_NAME}_en.mp4')
+            VideoEditor.chromoKey(input_path=f'{PROJECT_NAME}\\RU\\video\\1-14_crop.mp4', output_path=f'{folder_video}\\chromo_{PROJECT_NAME}_en.mp4')
             print('Создано видео с хромакеем')
     except:
             exit('Ошибка создания видео с хромакеем!')
@@ -297,7 +302,7 @@ def create_shorts_en():
         video1 = VideoFileClip(f'{folder_video}\\frame_{PROJECT_NAME}_en.mp4')
         video2 = VideoFileClip(f'{folder_video}\\sub_video_{PROJECT_NAME}_en.mp4')
         final_clip = concatenate_videoclips([video1, video2])
-        final_clip.write_videofile(f'{folder_video}\\{PROJECT_NAME}_en.mp4', codec="libx264", audio_codec="aac")
+        final_clip.write_videofile(f'{PROJECT_NAME}\\{PROJECT_NAME}_en.mp4', codec="libx264", audio_codec="aac")
         video1.close()
         video2.close()
         print(f'Создано видео с заставкой {PROJECT_NAME}_en.mp4')
@@ -305,10 +310,10 @@ def create_shorts_en():
         exit('Ошибка обьединения Заставки с видео!')
 
     try:
-        if os.path.exists(f'{folder_video}\\final_{PROJECT_NAME}_en.mp4'):
+        if os.path.exists(f'{PROJECT_NAME}\\final_{PROJECT_NAME}_en.mp4'):
             print(f"final_{PROJECT_NAME}_en.mp4 существует")
         else:
-            VideoEditor.crop(video_path=f'{folder_video}\\{PROJECT_NAME}_en.mp4', output_path= f'{folder_video}\\final_{PROJECT_NAME}_en.mp4')
+            VideoEditor.crop(video_path=f'{PROJECT_NAME}\\{PROJECT_NAME}_en.mp4', output_path= f'{PROJECT_NAME}\\final_{PROJECT_NAME}_en.mp4')
             print(f'Создано финальное видео final_{PROJECT_NAME}_en.mp4')
     except:
         exit(f'Ошибка создания финального видео final_{PROJECT_NAME}_en.mp4!')
@@ -316,7 +321,7 @@ def create_shorts_en():
     print('ОТЛИЧНАЯ РАБОТА!')
 
 def make_frame_en(t):
-    image_path = f'{PROJECT_NAME}\\EN\\image_crop\\1.jpg'
+    image_path = f'{PROJECT_NAME}\\RU\\image_crop\\1.jpg'
     image_clip = ImageClip(image_path)
     subtitle_clip_line1 = TextClip(CLIP_NAME_EN, fontsize=24, color='white', stroke_color='black',stroke_width=3, font='Segoe-UI-Bold', size=(image_clip.size[0]*3/4, None))
     subtitle_clip_line3 = TextClip(SECOND_FRAME_EN, fontsize=24, color='white', stroke_color='black',stroke_width=1,font='Segoe-UI-Bold', size=(image_clip.size[0]*3/4, None))
@@ -411,11 +416,11 @@ def extract_word_timings(audio_text, audio_file_path):
 def main():
     start_time = time.time()
 
-    create_shorts_ru() 
+    # create_shorts_ru() 
     create_shorts_en()
 
-
-    # len = len_simbols('text\\Venus_en.txt')
+    # len = len_simbols(f'{PROJECT_NAME}\\EN\\{PROJECT_NAME}_en.txt')
+    # len = len_simbols(f'{PROJECT_NAME}\\RU\\{PROJECT_NAME}_ru.txt')
     # print(len)
     # clip = AudioFileClip('audio\\voice_Aurora_ru.mp3').duration
     # print(clip)
