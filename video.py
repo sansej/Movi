@@ -40,18 +40,22 @@ class VideoEditor:
         video_clip.close()
         audio_clip.close()
 
-    def crop(video_path,  output_path, duration=None, audio_path=None):
+    def crop(video_path,  output_path, duration=None, audio_path=None, start_end=None):
         """
         Parameters
         -----------
-        video_path - path to source video ``*.MP4``
+        video_path - видео файл ``*.MP4``
 
-        output_path - path to final video ``*.MP4``
+        output_path - итоговый файл ``*.MP4``
 
-        duration - duration in ``seconds``, default ``60s``
+        duration - длительность в ``секундах``, по умолчанию ``60сек``
 
         """
         video_clip = VideoFileClip(video_path)
+
+        if audio_path and duration or audio_path and start_end or duration and start_end:
+            print('Невозможно использовать два параметра одновременно!')
+            return
 
         if audio_path:
             audio_clip = AudioFileClip(audio_path)
@@ -65,15 +69,25 @@ class VideoEditor:
             else:
                 shutil.copy(video_path, output_path)
                 return
-                # # Переименование скопированного файла
-                # os.rename(новое_имя, новое_имя)
         
-        if duration:
+        elif duration:
             if video_clip.duration<=duration:
-                print('Crop no required')
+                print('Обрезка не требуется')
                 return
             else:
                 cropped_clip = video_clip.subclip(0, duration)
+                cropped_clip.write_videofile(output_path, codec='libx264', audio_codec=None)
+                video_clip.close()
+                cropped_clip.close()
+                return
+            
+        elif start_end:
+            start,end = start_end
+            if video_clip.duration<=start or video_clip.duration<end:
+                print('Параметры start или end некорректны')
+                return
+            else:
+                cropped_clip = video_clip.subclip(start, end)
                 cropped_clip.write_videofile(output_path, codec='libx264', audio_codec=None)
                 video_clip.close()
                 cropped_clip.close()
@@ -165,5 +179,100 @@ class VideoEditor:
 
         print(f"Видео успешно создано с целевым FPS: {target_fps}")
 
+    def segment_video(input_file, output_file, start_time, end_time):
+        cap = cv2.VideoCapture(input_file)
+
+        # Получаем информацию о видео
+        fps = cap.get(cv2.CAP_PROP_FPS)
+        total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+
+        # Вычисляем кадры для начала и конца сегмента
+        start_frame = int(start_time * fps)
+        end_frame = int(end_time * fps)
+
+        # Проверяем, что конечный кадр не превышает общее количество кадров
+        end_frame = min(end_frame, total_frames - 1)
+
+        # Устанавливаем указатель видео на начальный кадр
+        cap.set(cv2.CAP_PROP_POS_FRAMES, start_frame)
+
+        # Создаем объект VideoWriter для записи сегмента
+        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+        out = cv2.VideoWriter(output_file, fourcc, fps, (int(cap.get(3)), int(cap.get(4))))
+
+        # Считываем и записываем кадры в сегмент
+        for frame_number in range(start_frame, end_frame + 1):
+            ret, frame = cap.read()
+            if ret:
+                out.write(frame)
+            else:
+                break
+
+        # Закрываем видеофайлы
+        cap.release()
+        out.release()
+
+        print(f"Создан {output_file}")
+
+    def crop_resolution(input_file, output_file, target_resolution=(720, 1280)):
+        # Load the video clip
+        video_clip = VideoFileClip(input_file)
+        w,h = video_clip.size
+
+        # Trim the video
+        x1 = int((w-target_resolution[0])/2)
+        y1 = int((h-target_resolution[1])/2)
+        # Resize the video
+        resized_clip = video_clip.crop(x1=x1, y1=y1, x2=target_resolution[0]+x1, y2=target_resolution[1]+y1)
+
+        # Write the result to a file
+        resized_clip.write_videofile(output_file, codec="libx264", audio_codec=None)
+
+        # Close the clips
+        video_clip.close()
+        resized_clip.close()
+        print(f"Создан {output_file}")
+
+    def change_resolution(input_video, output_video, new_resolution):
+        # Load the video
+        clip = VideoFileClip(input_video)
+        w,h=clip.size
+
+        i = h/new_resolution[1]
+        resolution = (int(w/i), new_resolution[1])
+
+        # Change the resolution
+        new_clip = clip.resize(newsize=resolution)
+
+        # Save the modified video
+        new_clip.write_videofile(output_video, codec="libx264", audio_codec=None)
+
+    def cut_segment(video_path,output_path,start_end,target_resolution=(720,1280)):
+        try:
+            video_clip = VideoFileClip(video_path)
+            w,h=video_clip.size
+
+            if h>=target_resolution[1]:
+                i = h/target_resolution[1]
+                resolution = (int(w/i), target_resolution[1])
+
+                x1 = int((w-target_resolution[0])/2)
+                y1 = int((h-target_resolution[1])/2)
+
+                start,end = start_end
+
+                cropped_clip = video_clip.subclip(start, end)
+                res_clip = cropped_clip.resize(newsize=resolution)
+                resized_clip = res_clip.crop(x1=x1, y1=y1, x2=target_resolution[0]+x1, y2=target_resolution[1]+y1)
+
+                resized_clip.write_videofile(output_path, codec='libx264', audio_codec=None, audio=False)
+                video_clip.close()
+                cropped_clip.close()
+                res_clip.close()
+                resized_clip.close()
+            else:
+                print('Разрешение слишком мало!')
+        except:
+            print('Ошибка преобразования')
 
         

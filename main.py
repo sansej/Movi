@@ -4,6 +4,7 @@ from video import VideoEditor, AudioFileClip
 from image import ImageEditor
 from youtube import post_shorts
 # import speech_recognition as sr
+from pytube import YouTube
 import os 
 from moviepy.editor import VideoFileClip, VideoClip, ImageClip, CompositeVideoClip, TextClip, concatenate_videoclips
 # from moviepy.video.compositing.concatenate import concatenate_videoclips
@@ -15,14 +16,18 @@ from pydub import AudioSegment, silence
 import fnmatch
 import wave
 import numpy as np
+import keyboard
+import mouse
+import json 
 import time
+from datetime import datetime, timedelta
 from PIL import Image
 import cv2
 key = 'MVsaiNhymA81LvKqS9oezJeEpyZ2pYDtq9zFFQvnuWPwCMPmhiOLaI88'
 
-PROJECT_NAME = 'MachuPicchu'
-CLIP_NAME_EN = 'Machu\nPicchu'
-CLIP_NAME_RU = "Мачу-\nПикчу" #для разделения слов использовать \n
+PROJECT_NAME = 'Kepler'
+CLIP_NAME_EN = 'Kepler'
+CLIP_NAME_RU = "Кеплер" #для разделения слов использовать \n
 SECOND_FRAME_RU = "Интересные факты"
 SECOND_FRAME_EN = 'Interesting Facts'
 
@@ -366,64 +371,257 @@ def make_frame_ru(t):
 #         print(f"Ошибка сервиса распознавания речи: {e}")
 #         return None
 
-def extract_word_timings(audio_text, audio_file_path):
-    # Определение времени начала и конца каждого слова на основе текста и длительности аудио
+# def extract_word_timings(audio_text, audio_file_path):
+#     # Определение времени начала и конца каждого слова на основе текста и длительности аудио
 
-    # Получение времени молчания (пауз) в аудио
-    audio = AudioSegment.from_file(audio_file_path, format="mp3")
-    audio_duration = len(audio) / 1000  # преобразование миллисекунд в секунды
-    # Сохранение аудио во временный WAV-файл
-    # temp_wav_file = "temp_audio.wav"
-    # audio.export(temp_wav_file, format="wav")
-    # recognizer = sr.Recognizer()
+#     # Получение времени молчания (пауз) в аудио
+#     audio = AudioSegment.from_file(audio_file_path, format="mp3")
+#     audio_duration = len(audio) / 1000  # преобразование миллисекунд в секунды
+#     # Сохранение аудио во временный WAV-файл
+#     # temp_wav_file = "temp_audio.wav"
+#     # audio.export(temp_wav_file, format="wav")
+#     # recognizer = sr.Recognizer()
 
-    silent_ranges = silence.detect_silence(audio, min_silence_len=530, silence_thresh=-40)
+#     silent_ranges = silence.detect_silence(audio, min_silence_len=530, silence_thresh=-40)
 
-    # Перевод в миллисекунды
-    silent_ranges = [(start / 1000, stop / 1000) for start, stop in silent_ranges]
-    print(silent_ranges)
+#     # Перевод в миллисекунды
+#     silent_ranges = [(start / 1000, stop / 1000) for start, stop in silent_ranges]
+#     print(silent_ranges)
 
-    tim = 0
-    for item in silent_ranges:
-        tim = tim + item[1]-item[0]
-    print(tim)
-    word_timings = []
-    words = audio_text.split()
+#     tim = 0
+#     for item in silent_ranges:
+#         tim = tim + item[1]-item[0]
+#     print(tim)
+#     word_timings = []
+#     words = audio_text.split()
 
-    word_start = 0
-    word_end = 0
+#     word_start = 0
+#     word_end = 0
 
-    for word in words:
-        word_duration = len(word) / len(audio_text) * audio_duration
-        word_end = word_start + word_duration
-        word_timings.append({"word": word, "start": word_start, "end": word_end})
-        word_start = word_end + tim/(len(words)-1)
+#     for word in words:
+#         word_duration = len(word) / len(audio_text) * audio_duration
+#         word_end = word_start + word_duration
+#         word_timings.append({"word": word, "start": word_start, "end": word_end})
+#         word_start = word_end + tim/(len(words)-1)
 
-    return word_timings
+#     return word_timings
 
-# def process_audio_file(audio_file_path):
-#     # Получение текста из аудио файла
-#     text = 'Северное сияние или аврора — атмосферное оптическое явление, свечение верхних слоёв атмосферы, возникающее вследствие взаимодействия магнитосферы Земли с заряженными частицами солнечного ветра. Спектр полярного сияния зависит от состава атмосферы. Для Земли наиболее яркими являются линии излучения возбуждённых атомов кислорода и азота в видимом диапазоне. Интенсивность северного сияния зависит от солнечного цикла, который длится около 11 лет. В пике солнечной активности аврора может быть более яркой и чаще встречаться, в этот период аврора может проявляться в виде круговых образов, называемых "Кольца Кроули". Полярные сияния весной и осенью возникают заметно чаще, чем зимой и летом. Пик частотности приходится на периоды, ближайшие к весеннему и осеннему равноденствиям.'
-#     audio_text = text
 
-#     if audio_text is not None:
-#         # Извлечение времени начала и конца каждого слова
-#         word_timings = extract_word_timings(audio_text, audio_file_path)
-#         return word_timings
 
-#     return None
+def download_youtube_video(url, output_path='downloads', resolution = 'highest'):
+    try:
+        # Создаем объект YouTube
+        yt = YouTube(url)
+
+        # Получаем список видеопотоков
+        streams = yt.streams.filter(file_extension='mp4')
+
+        # Если выбрано конкретное разрешение, выбираем соответствующий поток
+        if resolution != 'highest':
+            streams = streams.filter(res=resolution)
+        
+        # Получаем видеопоток
+        video = streams.first()
+
+        # Проверяем, доступен ли видеопоток
+        if video is None:
+            print("Не удалось найти видео с выбранным разрешением.")
+            return
+
+        # Создаем папку для сохранения видео, если ее нет
+        import os
+        if not os.path.exists(output_path):
+            os.makedirs(output_path)
+
+        # Скачиваем видео
+        print(f"Загрузка видео ({resolution} разрешение): {yt.title}")
+        video.download(output_path)
+        print("Загрузка завершена!")
+
+    except Exception as e:
+        print(f"Произошла ошибка: {str(e)}")
+
+    except Exception as e:
+        print(f"Произошла ошибка: {str(e)}")
+
+    except Exception as e:
+        print(f"Произошла ошибка: {str(e)}")
+
+def get_video_resolution(video_path):
+    # Открываем видеофайл
+    cap = cv2.VideoCapture(video_path)
+
+    # Получаем разрешение видео
+    width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+    height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+
+    # Закрываем видеофайл
+    cap.release()
+    print(width, height)
+
+    return width, height
+
+def reresolution(video_path,output_path):
+
+    cap = cv2.VideoCapture(video_path)
+
+    # Получаем текущее разрешение видео
+    width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+    height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+
+    # Вычисляем новое разрешение с сохранением соотношения сторон
+    new_width, new_height = 720, int(720 / width * height)
+
+    # Указываем кодек и новое разрешение
+    fourcc = cv2.VideoWriter_fourcc(*'MP4V') #MP4V X264
+    out = cv2.VideoWriter(output_path, fourcc, 30.0, (new_width, new_height))
+
+    while cap.isOpened():
+        ret, frame = cap.read()
+
+        if not ret:
+            break
+
+        # Изменяем разрешение кадра
+        frame_resized = cv2.resize(frame, (new_width, new_height))
+
+        # Записываем измененный кадр в выходное видео
+        out.write(frame_resized)
+
+    # Освобождаем ресурсы
+    cap.release()
+    out.release()
+    cv2.destroyAllWindows()
+
+def split_video(input_video_path, output_video_path, start_time, end_time, resolution=(720,1280)):
+    """
+    Изменяет разрешение видео и обрезает его, чтобы подогнать под заданные размеры.
+
+    :param input_video_path: Путь к входному видеофайлу.
+    :param output_folder: Папка для сохранения выходных видеофайлов.
+    :param start_time: Начальное время сегмента (в секундах).
+    :param end_time: Конечное время сегмента (в секундах).
+    :param target_height: Высота кадра для выходного видео.
+    :param target_width: Ширина кадра для выходного видео.
+    """
+
+    # Открываем видеофайл
+    video_capture = cv2.VideoCapture(input_video_path)
+
+    # Получаем информацию о видео
+    fps = video_capture.get(cv2.CAP_PROP_FPS)
+    total_frames = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
+
+    # Вычисляем кадры, соответствующие началу и концу сегмента
+    start_frame = int(start_time * fps)
+    end_frame = min(int(end_time * fps), total_frames)
+
+    # Перемещаем указатель видео на начальный кадр
+    video_capture.set(cv2.CAP_PROP_POS_FRAMES, start_frame)
+
+    # Читаем первый кадр, чтобы получить размеры
+    ret, frame = video_capture.read()
+    if not ret:
+        return
+
+    # Изменяем разрешение до высоты 1280, сохраняя соотношение сторон
+    aspect_ratio = frame.shape[1] / resolution[1]
+    print('aspect_ratio ',aspect_ratio)
+    target_width = int(frame.shape[0] / aspect_ratio)
+    # target_hight = int(resolution[1] * aspect_ratio)
+    print('target_width ',target_width)
+    # print('target_hight ',target_hight)
+
+    # resized_frame = cv2.resize(frame, (target_width, resolution[1]))
+
+    # Создаем VideoWriter для записи выходного видео
+    fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # Выбираем кодек (можно использовать другие)
+    video_writer = cv2.VideoWriter(output_video_path, fourcc, fps, (target_width, resolution[1]))
+    # Записываем измененные и обрезанные кадры в выходное видео
+    for frame_num in range(start_frame, end_frame):
+        ret, frame = video_capture.read()
+        if not ret:
+            break
+        frame = cv2.resize(frame, (target_width, resolution[1]))
+
+        # Обрезаем кадр до указанной ширины
+        crop_start = int((frame.shape[1] - target_width) / 2)
+        crop_end = crop_start + target_width
+        frame = frame[:, crop_start:crop_end, :]
+
+        video_writer.write(frame)
+    print(f'Создан {output_video_path}')
+
+    # Освобождаем ресурсы
+    video_capture.release()
+    video_writer.release()
+
+def run_timer():
+    class Timer:
+        def __init__(self):
+            self.start_time = None
+            self.is_running = False
+            self.timestamps = []
+
+        def start_stop_timer(self):
+            if not self.is_running:
+                print("Таймер запущен")
+                self.start_time = time.time()
+            else:
+                elapsed_time = time.time() - self.start_time
+                print(f"Timer stopped. Elapsed time: {elapsed_time:.2f} сек")
+            self.is_running = not self.is_running
+
+        def record_timestamp(self):
+            if self.is_running:
+                elapsed_time = round(time.time() - self.start_time,3)
+                self.timestamps.append(elapsed_time)
+                print(f"Время: {elapsed_time:.2f} сек")
+
+    timer = Timer()
+
+    keyboard.add_hotkey('space', timer.start_stop_timer)
+    mouse.on_click(timer.record_timestamp)
+
+    print("Нажми 'Пробел' чтобы запустить/остановить таймер")
+    print("Кликни левой кнопкой мыши, чтобы записать время")
+
+    keyboard.wait('esc')  # Wait for 'Esc' key to exit
+
+    # Save timestamps to a file
+    filename = 'timestamps.json'
+    with open(filename, 'w') as file:
+        json.dump(timer.timestamps, file)
+
+    print(f"Timestamps saved to {filename}.")
+
+def process_json_file(duration=5, json_file='timestamps.json'):
+    with open(json_file, 'r') as file:
+        json_array = json.load(file)
+    result = []
+    for start_time_seconds in json_array:
+        end_time_seconds = start_time_seconds + duration
+        result.append((start_time_seconds, round(end_time_seconds,3)))
+
+    return result
 
 def main():
     start_time = time.time()
 
     # create_shorts_ru() 
-    create_shorts_en()
+    # create_shorts_en()
 
-    # len = len_simbols(f'{PROJECT_NAME}\\EN\\{PROJECT_NAME}_en.txt')
-    # len = len_simbols(f'{PROJECT_NAME}\\RU\\{PROJECT_NAME}_ru.txt')
-    # print(len)
-    # clip = AudioFileClip('audio\\voice_Aurora_ru.mp3').duration
-    # print(clip)
+    # download_youtube_video(url='https://www.youtube.com/watch?v=J8lJtgyAcIA') #рабочий вариант
+    # run_timer()
+    segments = process_json_file()
+    for i,segment in enumerate(segments,start=1):
+        VideoEditor.cut_segment(video_path='downloads\\3.mp4',output_path=f'SEGMENTS\\{i}.mp4',start_end=segment)
+
+    # print(len_simbols(f'{PROJECT_NAME}\\EN\\{PROJECT_NAME}_en.txt'))
+    # print(len_simbols(f'{PROJECT_NAME}\\RU\\{PROJECT_NAME}_ru.txt'))
+
+    # print(AudioFileClip('audio\\voice_Aurora_ru.mp3').duration)
+
 
     # VideoEditor.combinate(audio_path='audio\\voice_Aurora_ru.mp3',video_path='video\\Aurora\\1-14_crop.mp4',output_path='test.mp4')
     # audio_file_path = "audio\\voice_Aurora_ru.mp3"
@@ -444,6 +642,7 @@ def main():
     # if result is not None:
     #     for item in result:
     #         print(f"Слово: {item['word']}, Начало: {item['start']:.2f} сек., Конец: {item['end']:.2f} сек.")
+
 
 
     end_time = time.time()

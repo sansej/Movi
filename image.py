@@ -19,9 +19,14 @@ class ImageEditor:
         img = Image.open(input_path)
         width, height = img.size
         if width>=size[0] and height>=size[1]:
-            i = height/size[1]
-            new = img.resize((int(width/i), size[1]), Image.Resampling.LANCZOS)
+            try:
+                i = height/size[1]
+                new = img.resize((int(width/i), size[1]), Image.Resampling.LANCZOS)
+            except:
+                i = width/size[0]
+                new = img.resize((size[0], int(height/i)), Image.Resampling.LANCZOS)
             new.save(output_path)
+
 
     def crop_image(input_path, output_path, resolution = (720, 1280)):
         """
