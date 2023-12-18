@@ -270,6 +270,7 @@ class VideoEditor:
                 cropped_clip.close()
                 res_clip.close()
                 resized_clip.close()
+                print(f'Создано {output_path}')
             else:
                 print('Разрешение слишком мало!')
         except:
