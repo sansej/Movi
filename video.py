@@ -247,21 +247,24 @@ class VideoEditor:
         # Save the modified video
         new_clip.write_videofile(output_video, codec="libx264", audio_codec=None)
 
-    def cut_segment(video_path,output_path,start_end,target_resolution=(720,1280)):
+    def cut_resize_crop(video_path,output_path,start_end=None,target_resolution=(720,1280)):
         try:
             video_clip = VideoFileClip(video_path)
             w,h=video_clip.size
+            # print(w,h)
 
             if h>=target_resolution[1]:
-                i = h/target_resolution[1]
-                resolution = (int(w/i), target_resolution[1])
+                index = h/target_resolution[1]
+                resolution = (int(w/index), target_resolution[1])
 
-                x1 = int((w-target_resolution[0])/2)
-                y1 = int((h-target_resolution[1])/2)
+                x1 = int((resolution[0]-target_resolution[0])/2)
+                y1 = int((resolution[1]-target_resolution[1])/2)
 
-                start,end = start_end
-
-                cropped_clip = video_clip.subclip(start, end)
+                cropped_clip = video_clip
+                if start_end != None:
+                    start,end = start_end
+                    cropped_clip = video_clip.subclip(start, end)
+                
                 res_clip = cropped_clip.resize(newsize=resolution)
                 resized_clip = res_clip.crop(x1=x1, y1=y1, x2=target_resolution[0]+x1, y2=target_resolution[1]+y1)
 
