@@ -251,32 +251,33 @@ class VideoEditor:
         try:
             video_clip = VideoFileClip(video_path)
             w,h=video_clip.size
-            # print(w,h)
+            if target_resolution!=video_clip.size:
+                if h>=target_resolution[1]:
+                    i = h/target_resolution[1]
+                    target_width = int(w/i)
+                    resolution = (target_width, target_resolution[1])
 
-            if h>=target_resolution[1]:
-                index = h/target_resolution[1]
-                resolution = (int(w/index), target_resolution[1])
+                    x1 = int((resolution[0]-target_resolution[0])/2)
+                    y1 = int((resolution[1]-target_resolution[1])/2)
 
-                x1 = int((resolution[0]-target_resolution[0])/2)
-                y1 = int((resolution[1]-target_resolution[1])/2)
+                    cropped_clip = video_clip
+                    if start_end != None:
+                        start,end = start_end
+                        cropped_clip = video_clip.subclip(start, end)
 
-                cropped_clip = video_clip
-                if start_end != None:
-                    start,end = start_end
-                    cropped_clip = video_clip.subclip(start, end)
-                
-                res_clip = cropped_clip.resize(newsize=resolution)
-                resized_clip = res_clip.crop(x1=x1, y1=y1, x2=target_resolution[0]+x1, y2=target_resolution[1]+y1)
-
-                resized_clip.write_videofile(output_path, codec='libx264', audio_codec=None, audio=False)
-                video_clip.close()
-                cropped_clip.close()
-                res_clip.close()
-                resized_clip.close()
-                print(f'Создано {output_path}')
+                    res_clip = cropped_clip.resize(newsize=resolution)
+                    resized_clip = res_clip.crop(x1=x1, y1=y1, x2=target_resolution[0]+x1, y2=target_resolution[1]+y1)
+                    resized_clip.write_videofile(output_path, fps = 30, codec='libx264', audio_codec=None, audio=False)
+                    video_clip.close()
+                    cropped_clip.close()
+                    res_clip.close()
+                    resized_clip.close()
+                    print(f'Создано {output_path}')
+                else:
+                    print('Разрешение слишком мало!')
             else:
-                print('Разрешение слишком мало!')
-        except:
-            print('Ошибка преобразования')
+                print('Преобразование не требуется')
+        except Exception as e:
+            print(f'Ошибка: {e}')
 
         

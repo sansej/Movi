@@ -25,9 +25,9 @@ from PIL import Image
 import cv2
 key = 'MVsaiNhymA81LvKqS9oezJeEpyZ2pYDtq9zFFQvnuWPwCMPmhiOLaI88'
 
-PROJECT_NAME = 'BlackHole'
-CLIP_NAME_EN = 'Black\nHole'
-CLIP_NAME_RU = "Черная\nдыра" #для разделения слов использовать \n
+PROJECT_NAME = 'MarbleCave'
+CLIP_NAME_EN = 'Marble\nCave'
+CLIP_NAME_RU = "Пещера\nмрамора" #для разделения слов использовать \n
 SECOND_FRAME_RU = "Интересные факты"
 SECOND_FRAME_EN = 'Interesting Facts'
 
@@ -104,14 +104,14 @@ def create_shorts_ru():
                         print(f"{file} уже существует")
                 else:
                     print('Неверный формат исходного файла!')
-        except:
-            exit('Ошибка: Картинка не обрезана')
+        except Exception as e:
+            exit(f'Ошибка: {e}')
 
         try:
             video = VideoClip(make_frame=make_frame_ru, duration=0.1)
             video.write_videofile(f'{folder_video}\\frame_{PROJECT_NAME}_ru.mp4', fps=30, codec="libx264")
-        except:
-            print('Ошибка создания Заставки!')
+        except Exception as e:
+            print(f'Ошибка: {e}')
 
         try:
             count = 1
@@ -158,8 +158,8 @@ def create_shorts_ru():
             else:
                 VideoEditor.crop(video_path=f'{folder_video}\\1-14.mp4', output_path= f'{folder_video}\\1-14_crop.mp4', audio_path = f'{PROJECT_NAME}\\RU\\{PROJECT_NAME}_ru.mp3')
                 print('Создан файл 1-14_crop.mp4')
-        except:
-            exit(f'Ошибка: Не создано видео 1-14_crop.mp4')
+        except Exception as e:
+            exit(f'Ошибка: {e}')
         
         try:
             if os.path.exists(f'{folder_video}\\chromo_{PROJECT_NAME}_ru.mp4'):
@@ -617,13 +617,13 @@ def main():
     start_time = time.time()
 
     create_shorts_ru() 
-    # create_shorts_en()
+    create_shorts_en()
 
     # download_youtube_video(url='https://www.youtube.com/watch?v=J8lJtgyAcIA') #рабочий вариант
     # run_timer()
     # segments = process_json_file()
     # for i,segment in enumerate(segments,start=1):
-    #     VideoEditor.cut_segment(video_path='downloads\\3.mp4',output_path=f'SEGMENTS\\{i}.mp4',start_end=segment)
+    #     VideoEditor.cut_resize_crop(video_path='downloads\\7.mp4',output_path=f'SEGMENTS\\15_{i}.mp4',start_end=segment)
     # for i in range(1,20):
     #     VideoEditor.cut_resize_crop(video_path=f'Pluto\\plut{i}.mp4',output_path=f'Pluto\\pluto{i}_crop.mp4')
 
