@@ -247,7 +247,7 @@ class VideoEditor:
         # Save the modified video
         new_clip.write_videofile(output_video, codec="libx264", audio_codec=None)
 
-    def cut_resize_crop(video_path,output_path,start_end=None,target_resolution=(720,1280)):
+    def cut_resize_crop(video_path,output_path,start_end=None,target_resolution=(720,1280), part_0_9 = None):
         try:
             video_clip = VideoFileClip(video_path)
             w,h=video_clip.size
@@ -255,10 +255,25 @@ class VideoEditor:
                 if h>=target_resolution[1]:
                     i = h/target_resolution[1]
                     target_width = int(w/i)
+                    w_part = target_width/10
                     resolution = (target_width, target_resolution[1])
+                   
+                    if part_0_9 == None:
+                        x1 = int((resolution[0]-target_resolution[0])/2)
+                        y1 = int((resolution[1]-target_resolution[1])/2)
+                        x2 = x1 + target_resolution[0]
+                        y2 = y1 + target_resolution[1]
+                    else:
+                        x1 = w_part*part_0_9
+                        y1 = int((resolution[1]-target_resolution[1])/2)
+                        x2 = x1 + target_resolution[0]
+                        y2 = y1 + target_resolution[1]
+                        if part_0_9 == 0:
+                            x1,x2,y1,y2 = (0,target_resolution[0],0,target_resolution[1])
+                        elif part_0_9 == 9:
+                            x1,x2,y1,y2 = (target_width-target_resolution[0],target_width,0,target_resolution[1])
 
-                    x1 = int((resolution[0]-target_resolution[0])/2)
-                    y1 = int((resolution[1]-target_resolution[1])/2)
+                    # print(x1,x2,y1,y2)
 
                     cropped_clip = video_clip
                     if start_end != None:
@@ -266,7 +281,7 @@ class VideoEditor:
                         cropped_clip = video_clip.subclip(start, end)
 
                     res_clip = cropped_clip.resize(newsize=resolution)
-                    resized_clip = res_clip.crop(x1=x1, y1=y1, x2=target_resolution[0]+x1, y2=target_resolution[1]+y1)
+                    resized_clip = res_clip.crop(x1=x1, y1=y1, x2=x2, y2=y2)
                     resized_clip.write_videofile(output_path, fps = 30, codec='libx264', audio_codec=None, audio=False)
                     video_clip.close()
                     cropped_clip.close()

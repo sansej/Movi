@@ -25,9 +25,9 @@ from PIL import Image
 import cv2
 key = 'MVsaiNhymA81LvKqS9oezJeEpyZ2pYDtq9zFFQvnuWPwCMPmhiOLaI88'
 
-PROJECT_NAME = 'MarbleCave'
-CLIP_NAME_EN = 'Marble\nCave'
-CLIP_NAME_RU = "Пещера\nмрамора" #для разделения слов использовать \n
+PROJECT_NAME = 'MoonStory'
+CLIP_NAME_EN = 'Moon\nStory'
+CLIP_NAME_RU = "История\nЛуны" #для разделения слов использовать \n
 SECOND_FRAME_RU = "Интересные факты"
 SECOND_FRAME_EN = 'Interesting Facts'
 
@@ -616,16 +616,17 @@ def process_json_file(duration=5, json_file='timestamps.json'):
 def main():
     start_time = time.time()
 
-    create_shorts_ru() 
-    create_shorts_en()
+    # create_shorts_ru() 
+    # create_shorts_en()
 
     # download_youtube_video(url='https://www.youtube.com/watch?v=J8lJtgyAcIA') #рабочий вариант
     # run_timer()
-    # segments = process_json_file()
-    # for i,segment in enumerate(segments,start=1):
-    #     VideoEditor.cut_resize_crop(video_path='downloads\\7.mp4',output_path=f'SEGMENTS\\15_{i}.mp4',start_end=segment)
-    # for i in range(1,20):
-    #     VideoEditor.cut_resize_crop(video_path=f'Pluto\\plut{i}.mp4',output_path=f'Pluto\\pluto{i}_crop.mp4')
+    segments = process_json_file()
+    name = len(os.listdir('SEGMENTS'))
+    for i,segment in enumerate(segments,start=1):
+        new_name = name + i
+        VideoEditor.cut_resize_crop(video_path='downloads\\3.mp4',output_path=f'SEGMENTS\\{new_name}.mp4',start_end=segment)
+
 
     # print(len_simbols(f'{PROJECT_NAME}\\EN\\{PROJECT_NAME}_en.txt'))
     # print(len_simbols(f'{PROJECT_NAME}\\RU\\{PROJECT_NAME}_ru.txt'))
