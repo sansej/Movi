@@ -617,16 +617,17 @@ def main():
     start_time = time.time()
 
     # create_shorts_ru() 
-    # create_shorts_en()
+    create_shorts_en()
 
     # download_youtube_video(url='https://www.youtube.com/watch?v=J8lJtgyAcIA') #рабочий вариант
     # run_timer()
-    segments = process_json_file()
-    name = len(os.listdir('SEGMENTS'))
-    for i,segment in enumerate(segments,start=1):
-        new_name = name + i
-        VideoEditor.cut_resize_crop(video_path='downloads\\3.mp4',output_path=f'SEGMENTS\\{new_name}.mp4',start_end=segment)
+    # segments = process_json_file()
+    # name = len(os.listdir('SEGMENTS'))
+    # for i,segment in enumerate(segments,start=1):
+    #     new_name = name + i
+    #     VideoEditor.cut_resize_crop(video_path='downloads\\3.mp4',output_path=f'SEGMENTS\\{new_name}.mp4',start_end=segment)
 
+    # VideoEditor.change_video_fps(input_video_path='hole14.mp4',output_video_path='test.mp4')
 
     # print(len_simbols(f'{PROJECT_NAME}\\EN\\{PROJECT_NAME}_en.txt'))
     # print(len_simbols(f'{PROJECT_NAME}\\RU\\{PROJECT_NAME}_ru.txt'))

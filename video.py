@@ -147,37 +147,40 @@ class VideoEditor:
         out.release()
         cv2.destroyAllWindows()
             
-    def change_video_fps(input_video_path, output_video_path, target_fps):
+    def change_video_fps(input_video_path, output_video_path, target_fps=30):
         # Открываем видеофайл
         cap = cv2.VideoCapture(input_video_path)
 
         # Получаем текущее FPS
         current_fps = cap.get(cv2.CAP_PROP_FPS)
-        print(f"Текущий FPS: {current_fps}")
 
-        # Получаем размер кадра
-        frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-        frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        if current_fps != target_fps:
 
-        # Создаем объект VideoWriter для записи видео
-        fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # Вы можете изменить формат на другой, если нужно
-        out = cv2.VideoWriter(output_video_path, fourcc, target_fps, (frame_width, frame_height))
+            # Получаем размер кадра
+            frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+            frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
-        # Читаем кадры из видео и записываем их с новым FPS
-        while True:
-            ret, frame = cap.read()
+            # Создаем объект VideoWriter для записи видео
+            fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # Вы можете изменить формат на другой, если нужно
+            out = cv2.VideoWriter(output_video_path, fourcc, target_fps, (frame_width, frame_height))
 
-            if not ret:
-                break
+            # Читаем кадры из видео и записываем их с новым FPS
+            while True:
+                ret, frame = cap.read()
 
-            # Записываем кадр в выходное видео
-            out.write(frame)
+                if not ret:
+                    break
 
-        # Закрываем видеофайлы
-        cap.release()
-        out.release()
+                # Записываем кадр в выходное видео
+                out.write(frame)
 
-        print(f"Видео успешно создано с целевым FPS: {target_fps}")
+            # Закрываем видеофайлы
+            cap.release()
+            out.release()
+
+            print(f"Видео успешно создано с целевым FPS: {target_fps}")
+        else:
+            print(f"FPS в норме!")
 
     def segment_video(input_file, output_file, start_time, end_time):
         cap = cv2.VideoCapture(input_file)
@@ -272,8 +275,6 @@ class VideoEditor:
                             x1,x2,y1,y2 = (0,target_resolution[0],0,target_resolution[1])
                         elif part_0_9 == 9:
                             x1,x2,y1,y2 = (target_width-target_resolution[0],target_width,0,target_resolution[1])
-
-                    # print(x1,x2,y1,y2)
 
                     cropped_clip = video_clip
                     if start_end != None:
