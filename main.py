@@ -25,9 +25,9 @@ from PIL import Image
 import cv2
 key = 'MVsaiNhymA81LvKqS9oezJeEpyZ2pYDtq9zFFQvnuWPwCMPmhiOLaI88'
 
-PROJECT_NAME = 'EarthsFuture'
-CLIP_NAME_EN = "Earth's\nFuture"
-CLIP_NAME_RU = "Будущее\nЗемли" #для разделения слов использовать \n
+PROJECT_NAME = 'KuiperBelt'
+CLIP_NAME_EN = "Kuiper\nBelt"
+CLIP_NAME_RU = "Пояс\nКойпера" #для разделения слов использовать \n
 SECOND_FRAME_RU = "Интересные факты"
 SECOND_FRAME_EN = 'Interesting Facts'
 
@@ -607,55 +607,44 @@ def process_json_file(duration=5, json_file='timestamps.json'):
     with open(json_file, 'r') as file:
         json_array = json.load(file)
     result = []
+    segment = None
     for start_time_seconds in json_array:
+        if type(start_time_seconds) == str:
+            tm = start_time_seconds.split(':')
+            start_time_seconds = int(tm[0])*60+int(tm[1])
+            try:
+                segment = int(tm[2])
+            except:
+                segment = None
         end_time_seconds = start_time_seconds + duration
-        result.append((start_time_seconds, round(end_time_seconds,3)))
+        result.append((start_time_seconds, round(end_time_seconds,3),segment))
 
     return result
 
 def main():
     start_time = time.time()
 
-    create_shorts_ru() 
-    create_shorts_en()
+    # create_shorts_ru() 
+    # create_shorts_en()
+
 
     # download_youtube_video(url='https://www.youtube.com/watch?v=J8lJtgyAcIA') #рабочий вариант
     # run_timer()
-    # segments = process_json_file()
-    # name = len(os.listdir('SEGMENTS'))
-    # for i,segment in enumerate(segments,start=1):
-    #     new_name = name + i
-    #     VideoEditor.cut_resize_crop(video_path='downloads\\3.mp4',output_path=f'SEGMENTS\\{new_name}.mp4',start_end=segment,part_0_9=None)
 
-    # VideoEditor.change_video_fps(input_video_path='hole14.mp4',output_video_path='test.mp4')
+
+    segments = process_json_file()
+    name = len(os.listdir('SEGMENTS'))
+    for i,segment in enumerate(segments,start=1):
+        seg = (segment[0],segment[1])
+        new_name = name + i
+        VideoEditor.cut_resize_crop(video_path='downloads\\49.mp4',output_path=f'SEGMENTS\\{new_name}.mp4',start_end=seg,part_0_9=segment[2])
+
+
 
     # print(len_simbols(f'{PROJECT_NAME}\\EN\\{PROJECT_NAME}_en.txt'))
     # print(len_simbols(f'{PROJECT_NAME}\\RU\\{PROJECT_NAME}_ru.txt'))
 
-    # print(AudioFileClip('audio\\voice_Aurora_ru.mp3').duration)
-
-
-    # VideoEditor.combinate(audio_path='audio\\voice_Aurora_ru.mp3',video_path='video\\Aurora\\1-14_crop.mp4',output_path='test.mp4')
-    # audio_file_path = "audio\\voice_Aurora_ru.mp3"
-    # result = process_audio_file(audio_file_path)
-    # sub=[]
-    # if result is not None:
-    #     for item in result:
-    #         sub.append((item['start'],item['end'],item['word']))
-    # print(sub)
-    # # sub = AudioEditor.to_subtitle(audio_file_path='test.mp3', text=text)
-    # sub_clip = SubtitleEditor.create_subtitle_clips(sub,(720,1280),fontsize=70, stroke_color='black', font='Arial-Rounded-MT-Bold')
-    # clip = VideoFileClip('test.mp4')
-    # result_clip = VideoEditor.create_transition([clip],sub_clip,overlap=0.5)
-    # result_clip.write_videofile('final.mp4', codec="libx264", audio_codec=None, fps=30)
-
-    # audio_file_path = "test.mp3"
-    # result = process_audio_file(audio_file_path)
-    # if result is not None:
-    #     for item in result:
-    #         print(f"Слово: {item['word']}, Начало: {item['start']:.2f} сек., Конец: {item['end']:.2f} сек.")
-
-
+ 
 
     end_time = time.time()
     execution_time = end_time - start_time
