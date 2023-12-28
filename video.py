@@ -256,10 +256,16 @@ class VideoEditor:
             w,h=video_clip.size
             if target_resolution!=video_clip.size:
                 if h>=target_resolution[1]:
-                    i = h/target_resolution[1]
-                    target_width = int(w/i)
-                    w_part = target_width/10
-                    resolution = (target_width, target_resolution[1])
+                    if h>w:
+                        i = w/target_resolution[0]
+                        target_hight = int(h/i)
+                        # w_part = target_width/10
+                        resolution = (target_resolution[0],target_hight)
+                    else:
+                        i = h/target_resolution[1]
+                        target_width = int(w/i)
+                        w_part = target_width/10
+                        resolution = (target_width, target_resolution[1])
                    
                     if part_0_9 == None:
                         x1 = int((resolution[0]-target_resolution[0])/2)
@@ -289,6 +295,7 @@ class VideoEditor:
                     res_clip.close()
                     resized_clip.close()
                     print(f'Создано {output_path}')
+
                 else:
                     print('Разрешение слишком мало!')
             else:
