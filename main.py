@@ -1,5 +1,5 @@
 from audio import AudioEditor
-from subtitle import SubtitleEditor, len_simbols
+from subtitle import SubtitleEditor, len_simbols, generate_subtitles
 from video import VideoEditor, AudioFileClip
 from image import ImageEditor
 from youtube import post_shorts
@@ -25,26 +25,26 @@ from PIL import Image
 import cv2
 key = 'MVsaiNhymA81LvKqS9oezJeEpyZ2pYDtq9zFFQvnuWPwCMPmhiOLaI88'
 
-PROJECT_NAME = 'KuiperBelt'
-CLIP_NAME_EN = "Kuiper\nBelt"
-CLIP_NAME_RU = "Пояс\nКойпера" #для разделения слов использовать \n
+PROJECT_NAME = 'Triton'
+CLIP_NAME_EN = "Triton"
+CLIP_NAME_RU = "Тритон" #для разделения слов использовать \n
 SECOND_FRAME_RU = "Интересные факты"
 SECOND_FRAME_EN = 'Interesting Facts'
 
 def create_shorts_ru():
         count = 1
         text=''
-        folder_source = f'{PROJECT_NAME}\\RU\\source'
-        folter_image_crop = f'{PROJECT_NAME}\\RU\\image_crop'
-        folter_image_resize = f'{PROJECT_NAME}\\RU\\image_resize'
-        folder_video = f'{PROJECT_NAME}\\RU\\video'
-        voice = f'{PROJECT_NAME}\\RU\\voice_{PROJECT_NAME}_ru.mp3'
-        audio_file = f'{PROJECT_NAME}\\RU\\{PROJECT_NAME}_ru.mp3'
+        folder_source = f'src\\{PROJECT_NAME}\\RU\\source'
+        folter_image_crop = f'src\\{PROJECT_NAME}\\RU\\image_crop'
+        folter_image_resize = f'src\\{PROJECT_NAME}\\RU\\image_resize'
+        folder_video = f'src\\{PROJECT_NAME}\\RU\\video'
+        voice = f'src\\{PROJECT_NAME}\\RU\\voice_{PROJECT_NAME}_ru.mp3'
+        audio_file = f'src\\{PROJECT_NAME}\\RU\\{PROJECT_NAME}_ru.mp3'
         video_sound = f'{folder_video}\\video_sound_{PROJECT_NAME}.mp4'
         # image_list = ['1.jpg', '2.jpg', '3.jpg', '4.jpg', '5.jpg', '6.jpg', '7.jpg', '8.jpg', '9.jpg', '10.jpg','11.jpg','12.jpg','13.jpg','14.jpg','1.png', '2.png', '3.png', '4.png', '5.png', '6.png', '7.png', '8.png', '9.png','10.png','11.png','12.png','13.png','14.png']
 
         try:
-            with open(f'{PROJECT_NAME}\\RU\\{PROJECT_NAME}_ru.txt', 'r', encoding='UTF-8') as file:
+            with open(f'src\\{PROJECT_NAME}\\RU\\{PROJECT_NAME}_ru.txt', 'r', encoding='UTF-8') as file:
                 text = file.read()
                 file.close()
         except:
@@ -108,8 +108,11 @@ def create_shorts_ru():
             exit(f'Ошибка: {e}')
 
         try:
-            video = VideoClip(make_frame=make_frame_ru, duration=0.1)
-            video.write_videofile(f'{folder_video}\\frame_{PROJECT_NAME}_ru.mp4', fps=30, codec="libx264")
+            if os.path.exists(f'{folder_video}\\frame_{PROJECT_NAME}_ru.mp4'):
+                print(f"Файл frame_{PROJECT_NAME}_ru.mp4 существует!")
+            else:
+                video = VideoClip(make_frame=make_frame_ru, duration=0.1)
+                video.write_videofile(f'{folder_video}\\frame_{PROJECT_NAME}_ru.mp4', fps=30, codec="libx264")
         except Exception as e:
             print(f'Ошибка: {e}')
 
@@ -156,7 +159,7 @@ def create_shorts_ru():
             if os.path.exists(f'{folder_video}\\1-14_crop.mp4'):
                 print("Файл 1-14_crop.mp4 существует!")
             else:
-                VideoEditor.crop(video_path=f'{folder_video}\\1-14.mp4', output_path= f'{folder_video}\\1-14_crop.mp4', audio_path = f'{PROJECT_NAME}\\RU\\{PROJECT_NAME}_ru.mp3')
+                VideoEditor.crop(video_path=f'{folder_video}\\1-14.mp4', output_path= f'{folder_video}\\1-14_crop.mp4', audio_path = f'src\\{PROJECT_NAME}\\RU\\{PROJECT_NAME}_ru.mp3')
                 print('Создан файл 1-14_crop.mp4')
         except Exception as e:
             exit(f'Ошибка: {e}')
@@ -210,7 +213,7 @@ def create_shorts_ru():
                 video1 = VideoFileClip(f'{folder_video}\\frame_{PROJECT_NAME}_ru.mp4')
                 video2 = VideoFileClip(f'{folder_video}\\sub_video_{PROJECT_NAME}_ru.mp4')
                 final_clip = concatenate_videoclips([video1, video2])
-                final_clip.write_videofile(f'{PROJECT_NAME}\\{PROJECT_NAME}_ru.mp4', codec="libx264", audio_codec="aac", fps=30)
+                final_clip.write_videofile(f'src\\{PROJECT_NAME}\\{PROJECT_NAME}_ru.mp4', codec="libx264", audio_codec="aac", fps=30)
                 video1.close()
                 video2.close()
                 print(f'Создано видео с заставкой {PROJECT_NAME}_ru.mp4')
@@ -221,7 +224,7 @@ def create_shorts_ru():
             if os.path.exists(f'{folder_video}\\final_{PROJECT_NAME}_ru.mp4'):
                 print(f"final_{PROJECT_NAME}_ru.mp4 существует!")
             else:
-                VideoEditor.crop(video_path=f'{PROJECT_NAME}\\{PROJECT_NAME}_ru.mp4', output_path= f'{PROJECT_NAME}\\final_{PROJECT_NAME}_ru.mp4')
+                VideoEditor.crop(video_path=f'src\\{PROJECT_NAME}\\{PROJECT_NAME}_ru.mp4', output_path= f'src\\{PROJECT_NAME}\\final_{PROJECT_NAME}_ru.mp4')
                 print(f'Создано финальное видео final_{PROJECT_NAME}_ru.mp4')
         except:
             exit(f'Ошибка создания финального видео final_{PROJECT_NAME}_ru.mp4!')
@@ -229,8 +232,8 @@ def create_shorts_ru():
 
 def create_shorts_en():
     text=''
-    audio_file = f'{PROJECT_NAME}\\EN\\{PROJECT_NAME}_en.mp3'
-    folder_video = f'{PROJECT_NAME}\\EN\\video'
+    audio_file = f'src\\{PROJECT_NAME}\\EN\\{PROJECT_NAME}_en.mp3'
+    folder_video = f'src\\{PROJECT_NAME}\\EN\\video'
     video_sound = f'{folder_video}\\video_sound_{PROJECT_NAME}_en.mp4'
 
     if not os.path.exists(folder_video):
@@ -240,7 +243,7 @@ def create_shorts_en():
         print("Папка video уже существует!")
 
     try:
-        with open(f'{PROJECT_NAME}\\EN\\{PROJECT_NAME}_en.txt', 'r', encoding='UTF-8') as file:
+        with open(f'src\\{PROJECT_NAME}\\EN\\{PROJECT_NAME}_en.txt', 'r', encoding='UTF-8') as file:
             text = file.read()
             file.close()
     except:
@@ -273,7 +276,7 @@ def create_shorts_en():
         if os.path.exists(f'{folder_video}\\chromo_{PROJECT_NAME}_en.mp4'):
             print(f"chromo_{PROJECT_NAME}_en.mp4 существует!")
         else:
-            VideoEditor.chromoKey(input_path=f'{PROJECT_NAME}\\RU\\video\\1-14_crop.mp4', output_path=f'{folder_video}\\chromo_{PROJECT_NAME}_en.mp4')
+            VideoEditor.chromoKey(input_path=f'src\\{PROJECT_NAME}\\RU\\video\\1-14_crop.mp4', output_path=f'{folder_video}\\chromo_{PROJECT_NAME}_en.mp4')
             print('Создано видео с хромакеем')
     except:
             exit('Ошибка создания видео с хромакеем!')
@@ -315,7 +318,7 @@ def create_shorts_en():
         video1 = VideoFileClip(f'{folder_video}\\frame_{PROJECT_NAME}_en.mp4')
         video2 = VideoFileClip(f'{folder_video}\\sub_video_{PROJECT_NAME}_en.mp4')
         final_clip = concatenate_videoclips([video1, video2])
-        final_clip.write_videofile(f'{PROJECT_NAME}\\{PROJECT_NAME}_en.mp4', codec="libx264", audio_codec="aac")
+        final_clip.write_videofile(f'src\\{PROJECT_NAME}\\{PROJECT_NAME}_en.mp4', codec="libx264", audio_codec="aac")
         video1.close()
         video2.close()
         print(f'Создано видео с заставкой {PROJECT_NAME}_en.mp4')
@@ -323,10 +326,10 @@ def create_shorts_en():
         exit('Ошибка обьединения Заставки с видео!')
 
     try:
-        if os.path.exists(f'{PROJECT_NAME}\\final_{PROJECT_NAME}_en.mp4'):
+        if os.path.exists(f'src\\{PROJECT_NAME}\\final_{PROJECT_NAME}_en.mp4'):
             print(f"final_{PROJECT_NAME}_en.mp4 существует!")
         else:
-            VideoEditor.crop(video_path=f'{PROJECT_NAME}\\{PROJECT_NAME}_en.mp4', output_path= f'{PROJECT_NAME}\\final_{PROJECT_NAME}_en.mp4')
+            VideoEditor.crop(video_path=f'src\\{PROJECT_NAME}\\{PROJECT_NAME}_en.mp4', output_path= f'src\\{PROJECT_NAME}\\final_{PROJECT_NAME}_en.mp4')
             print(f'Создано финальное видео final_{PROJECT_NAME}_en.mp4')
     except:
         exit(f'Ошибка создания финального видео final_{PROJECT_NAME}_en.mp4!')
@@ -334,7 +337,7 @@ def create_shorts_en():
     print('ОТЛИЧНАЯ РАБОТА!')
 
 def make_frame_en(t):
-    image_path = f'{PROJECT_NAME}\\RU\\image_crop\\frame.jpg'
+    image_path = f'src\\{PROJECT_NAME}\\RU\\image_crop\\frame.jpg'
     image_clip = ImageClip(image_path)
     subtitle_clip_line1 = TextClip(CLIP_NAME_EN, fontsize=24, color='white', stroke_color='black',stroke_width=3, font='Segoe-UI-Bold', size=(image_clip.size[0]*3/4, None))
     subtitle_clip_line3 = TextClip(SECOND_FRAME_EN, fontsize=24, color='white', stroke_color='black',stroke_width=1,font='Segoe-UI-Bold', size=(image_clip.size[0]*3/4, None))
@@ -345,7 +348,7 @@ def make_frame_en(t):
     return video_clip.get_frame(t)
 
 def make_frame_ru(t):
-    image_path = f'{PROJECT_NAME}\\RU\\image_crop\\frame.jpg'
+    image_path = f'src\\{PROJECT_NAME}\\RU\\image_crop\\frame.jpg'
     image_clip = ImageClip(image_path)
     subtitle_clip_line1 = TextClip(CLIP_NAME_RU, fontsize=24, color='white', stroke_color='black',stroke_width=3, font='Segoe-UI-Bold', size=(image_clip.size[0]*3/4, None))
     subtitle_clip_line3 = TextClip(SECOND_FRAME_RU, fontsize=24, color='white', stroke_color='black',stroke_width=1,font='Segoe-UI-Bold', size=(image_clip.size[0]*3/4, None))
@@ -627,22 +630,24 @@ def main():
     # create_shorts_ru() 
     # create_shorts_en()
 
+    generate_subtitles(audio_file_path='src\\Aurora\\RU\\voice_Aurora_ru.mp3',output_subtitle_path='src\\Aurora\\RU\\Aurora_ru.srt')
+
 
     # download_youtube_video(url='https://www.youtube.com/watch?v=J8lJtgyAcIA') #рабочий вариант
     # run_timer()
 
 
-    segments = process_json_file()
-    name = len(os.listdir('SEGMENTS'))
-    for i,segment in enumerate(segments,start=1):
-        seg = (segment[0],segment[1])
-        new_name = name + i
-        VideoEditor.cut_resize_crop(video_path='downloads\\49.mp4',output_path=f'SEGMENTS\\{new_name}.mp4',start_end=seg,part_0_9=segment[2])
+    # segments = process_json_file()
+    # name = len(os.listdir('SEGMENTS'))
+    # for i,segment in enumerate(segments,start=1):
+    #     seg = (segment[0],segment[1])
+    #     new_name = name + i
+    #     VideoEditor.cut_resize_crop(video_path='src\\Triton\\RU\\source\\7.mp4',output_path=f'SEGMENTS\\{new_name}.mp4',start_end=seg,part_0_9=segment[2])
 
 
 
-    # print(len_simbols(f'{PROJECT_NAME}\\EN\\{PROJECT_NAME}_en.txt'))
-    # print(len_simbols(f'{PROJECT_NAME}\\RU\\{PROJECT_NAME}_ru.txt'))
+    # print(len_simbols(f'src\\{PROJECT_NAME}\\EN\\{PROJECT_NAME}_en.txt'))
+    # print(len_simbols(f'src\\{PROJECT_NAME}\\RU\\{PROJECT_NAME}_ru.txt'))
 
  
 

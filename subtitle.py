@@ -1,6 +1,13 @@
 from moviepy.editor import TextClip
 from moviepy.config import change_settings
 import unicodedata
+import speech_recognition as sr
+from pydub import AudioSegment
+import pysrt
+import nltk
+from nltk.tokenize import word_tokenize
+from datetime import timedelta
+nltk.download('punkt')
 
 class SubtitleEditor:
 
@@ -88,4 +95,59 @@ def len_simbols(file_path):
         return f'Файл {file_path} не обнаружен!'
 
 # ['AdobeArabic-Bold', 'AdobeArabic-BoldItalic', 'AdobeArabic-Italic', 'AdobeArabic-Regular', 'AdobeFanHeitiStd-Bold', 'AdobeGothicStd-Bold', 'AdobeHebrew-Bold', 'AdobeHebrew-BoldItalic', 'AdobeHebrew-Italic', 'AdobeHebrew-Regular', 'AdobeHeitiStd-Regular', 'AdobeMingStd-Light', 'AdobeMyungjoStd-Medium', 'AdobePiStd', 'AdobeSongStd-Light', 'AdobeThai-Bold', 'AdobeThai-BoldItalic', 'AdobeThai-Italic', 'AdobeThai-Regular', 'Agency-FB', 'Agency-FB-Pogrubiony', 'Algerian', 'Arial', 'Arial-Black', 'Arial-Bold', 'Arial-Bold-Italic', 'Arial-Italic', 'Arial-Narrow', 'Arial-Narrow-Kursywa', 'Arial-Narrow-Pogrubiona-kursywa', 'Arial-Narrow-Pogrubiony', 'Arial-Rounded-MT-Bold', 'Bahnschrift', 'Baskerville-Old-Face', 'Bauhaus-93', 'Bell-MT', 'Bell-MT-Kursywa', 'Bell-MT-Pogrubiony', 'Berlin-Sans-FB', 'Berlin-Sans-FB-Demi-Pogrubiony', 'Berlin-Sans-FB-Pogrubiony', 'Bernard-MT-Condensed', 'Blackadder-ITC', 'Bodoni-MT', 'Bodoni-MT-Black', 'Bodoni-MT-Black-Kursywa', 'Bodoni-MT-Condensed', 'Bodoni-MT-Condensed-Kursywa', 'Bodoni-MT-Condensed-Pogrubiona-kursywa', 'Bodoni-MT-Condensed-Pogrubiony', 'Bodoni-MT-Kursywa', 'Bodoni-MT-Pogrubiona-kursywa', 'Bodoni-MT-Pogrubiony', 'Bodoni-MT-Poster-Compressed', 'Book-Antiqua', 'Book-Antiqua-Kursywa', 'Book-Antiqua-Pogrubiona-kursywa', 'Book-Antiqua-Pogrubiony', 'Bookman-Old-Style', 'Bookman-Old-Style-Kursywa', 'Bookman-Old-Style-Pogrubiona-kursywa', 'Bookman-Old-Style-Pogrubiony', 'Bookshelf-Symbol-7', 'Bradley-Hand-ITC', 'Britannic-Bold', 'Broadway', 'Brush-Script-MT-Kursywa', 'Calibri', 'Calibri-Bold', 'Calibri-Bold-Italic', 'Calibri-Italic', 'Calibri-Light', 'Calibri-Light-Italic', 'Californian-FB', 'Californian-FB-Kursywa', 'Californian-FB-Pogrubiony', 'Calisto-MT', 'Calisto-MT-Kursywa', 'Calisto-MT-Pogrubiona-kursywa', 'Calisto-MT-Pogrubiony', 'Cambria-&-Cambria-Math', 'Cambria-Bold', 'Cambria-Bold-Italic', 'Cambria-Italic', 'Candara', 'Candara-Bold', 'Candara-Bold-Italic', 'Candara-Italic', 'Candara-Light', 'Candara-Light-Italic', 'Cascadia-Code-Regular', 'Cascadia-Mono-Regular', 'Castellar', 'CATIA-Symbols', 'Centaur', 'Century', 'Century-Gothic', 'Century-Gothic-Kursywa', 'Century-Gothic-Pogrubiona-kursywa', 'Century-Gothic-Pogrubiony', 'Century-Schoolbook', 'Century-Schoolbook-Kursywa', 'Century-Schoolbook-Pogrubiona-kursywa', 'Century-Schoolbook-Pogrubiony', 'Chiller', 'Colonna-MT', 'Comic-Sans-MS', 'Comic-Sans-MS-Bold', 'Comic-Sans-MS-Bold-Italic', 'Comic-Sans-MS-Italic', 'Consolas', 'Consolas-Bold', 'Consolas-Bold-Italic', 'Consolas-Italic', 'Constantia', 'Constantia-Bold', 'Constantia-Bold-Italic', 'Constantia-Italic', 'Cooper-Black', 'Copperplate-Gothic-Bold', 'Copperplate-Gothic-Light', 'Corbel', 'Corbel-Bold', 'Corbel-Bold-Italic', 'Corbel-Italic', 'Corbel-Light', 'Corbel-Light-Italic', 'Courier-10-Pitch-Bold-BT', 'Courier-10-Pitch-Bold-Italic-BT', 'Courier-10-Pitch-BT', 'Courier-10-Pitch-Italic-BT', 'Courier-New', 'Courier-New-Bold', 'Courier-New-Bold-Italic', 'Courier-New-Italic', 'CourierStd', 'CourierStd-Bold', 'CourierStd-BoldOblique', 'CourierStd-Oblique', 'Curlz-MT', 'Dubai-Bold', 'Dubai-Light', 'Dubai-Medium', 'Dubai-Regular', 'Dutch-801-Bold-BT', 'Dutch-801-Bold-Italic-BT', 'Dutch-801-Italic-BT', 'Dutch-801-Roman-BT', 'Ebrima', 'Ebrima-Bold', 'Edwardian-Script-ITC', 'Elephant', 'Elephant-Kursywa', 'Engravers-MT', 'Eras-Bold-ITC', 'Eras-Demi-ITC', 'Eras-Light-ITC', 'Eras-Medium-ITC', 'Felix-Titling', 'Footlight-MT-Light', 'Forte', 'Franklin-Gothic-Book', 'Franklin-Gothic-Book-Kursywa', 'Franklin-Gothic-Demi', 'Franklin-Gothic-Demi-Cond', 'Franklin-Gothic-Demi-Kursywa', 'Franklin-Gothic-Heavy', 'Franklin-Gothic-Heavy-Kursywa', 'Franklin-Gothic-Medium', 'Franklin-Gothic-Medium-Cond', 'Franklin-Gothic-Medium-Italic', 'Freestyle-Script', 'French-Script-MT', 'Gabriola', 'Gadugi', 'Gadugi-Bold', 'Garamond', 'Garamond-Kursywa', 'Garamond-Pogrubiony', 'Georgia', 'Georgia-Bold', 'Georgia-Bold-Italic', 'Georgia-Italic', 'Gigi', 'Gill-Sans-MT', 'Gill-Sans-MT-Condensed', 'Gill-Sans-MT-Ext-Condensed-Bold', 'Gill-Sans-MT-Kursywa', 'Gill-Sans-MT-Pogrubiona-kursywa', 'Gill-Sans-MT-Pogrubiony', 'Gill-Sans-Ultra-Bold', 'Gill-Sans-Ultra-Bold-Condensed', 'Gloucester-MT-Extra-Condensed', 'Goudy-Old-Style', 'Goudy-Old-Style-Kursywa', 'Goudy-Old-Style-Pogrubiony', 'Goudy-Stout', 'Haettenschweiler', 'Harlow-Solid-Italic', 'Harrington', 'High-Tower-Text', 'High-Tower-Text-Kursywa', 'Holo-MDL2-Assets', 'HYSWLongFangSong', 'Impact', 'Imprint-MT-Shadow', 'Informal-Roman', 'Ink-Free', 'Javanese-Text', 'Jokerman', 'Juice-ITC', 'KozGoPr6N-Medium', 'KozMinPr6N-Regular', 'Kristen-ITC', 'Kunstler-Script', 'Leelawadee-Pogrubiony', 'Leelawadee-UI', 'Leelawadee-UI-Bold', 'Leelawadee-UI-Semilight', 'Lucida-Bright', 'Lucida-Bright-Demibold', 'Lucida-Bright-Demibold-Italic', 'Lucida-Bright-Italic', 'Lucida-Calligraphy-Italic', 'Lucida-Console', 'Lucida-Fax-Demibold', 'Lucida-Fax-Demibold-Italic', 'Lucida-Fax-Italic', 'Lucida-Fax-Regular', 'Lucida-Handwriting-Italic', 'Lucida-Sans-Demibold-Italic', 'Lucida-Sans-Demibold-Roman', 'Lucida-Sans-Italic', 'Lucida-Sans-Regular', 'Lucida-Sans-Typewriter-Bold', 'Lucida-Sans-Typewriter-Bold-Oblique', 'Lucida-Sans-Typewriter-Oblique', 'Lucida-Sans-Typewriter-Regular', 'Lucida-Sans-Unicode', 'Magneto-Pogrubiony', 'Maiandra-GD', 'Malgun-Gothic', 'Malgun-Gothic-Bold', 'Malgun-Gothic-SemiLight', 'Matura-MT-Script-Capitals', 'Microsoft-Himalaya', 'Microsoft-JhengHei-&-Microsoft-JhengHei-UI', 'Microsoft-JhengHei-Bold-&-Microsoft-JhengHei-UI-Bold', 'Microsoft-JhengHei-Light-&-Microsoft-JhengHei-UI-Light', 'Microsoft-New-Tai-Lue', 'Microsoft-New-Tai-Lue-Bold', 'Microsoft-PhagsPa', 'Microsoft-PhagsPa-Bold', 'Microsoft-Sans-Serif', 'Microsoft-Tai-Le', 'Microsoft-Tai-Le-Bold', 'Microsoft-Uighur-Pogrubiony', 'Microsoft-YaHei-&-Microsoft-YaHei-UI', 'Microsoft-YaHei-Bold-&-Microsoft-YaHei-UI-Bold', 'Microsoft-YaHei-Light-&-Microsoft-YaHei-UI-Light', 'Microsoft-Yi-Baiti', 'MingLiU-ExtB-&-PMingLiU-ExtB-&-MingLiU_HKSCS-ExtB', 'MinionPro-Regular', 'Mistral', 'Modern-No.-20', 'Mongolian-Baiti', 'Monospace-821-Bold-BT', 'Monospace-821-Bold-Italic-BT', 'Monospace-821-BT', 'Monospace-821-Italic-BT', 'Monotype-Corsiva', 'MS-Gothic-&-MS-UI-Gothic-&-MS-PGothic', 'MS-Outlook', 'MS-Reference-Sans-Serif', 'MS-Reference-Specialty', 'MT-Extra', 'MV-Boli', 'Myanmar-Text', 'Myanmar-Text-Bold', 'MyriadCAD', 'MyriadPro-Regular', 'Niagara-Engraved', 'Niagara-Solid', 'Nirmala-UI', 'Nirmala-UI-Bold', 'Nirmala-UI-Semilight', 'OCR-A-Extended', 'Old-English-Text-MT', 'OLFSimpleSansOC-Regular', 'Onyx', 'Palace-Script-MT', 'Palatino-Linotype', 'Palatino-Linotype-Bold', 'Palatino-Linotype-Bold-Italic', 'Palatino-Linotype-Italic', 'Papyrus', 'Parchment', 'Perpetua', 'Perpetua-Kursywa', 'Perpetua-Pogrubiona-kursywa', 'Perpetua-Pogrubiony', 'Perpetua-Titling-MT-Light', 'Perpetua-Titling-MT-Pogrubiony', 'Playbill', 'Poor-Richard', 'Pristina', 'Rage-Italic', 'Ravie', 'Rockwell', 'Rockwell-Condensed', 'Rockwell-Condensed-Pogrubiony', 'Rockwell-Extra-Bold', 'Rockwell-Kursywa', 'Rockwell-Pogrubiona-kursywa', 'Rockwell-Pogrubiony', 'Sans-Serif-Collection', 'Script-MT-Bold', 'Segoe-Fluent-Icons', 'Segoe-MDL2-Assets', 'Segoe-Print', 'Segoe-Print-Bold', 'Segoe-Script', 'Segoe-Script-Bold', 'Segoe-UI', 'Segoe-UI-Black', 'Segoe-UI-Black-Italic', 'Segoe-UI-Bold', 'Segoe-UI-Bold-Italic', 'Segoe-UI-Emoji', 'Segoe-UI-Historic', 'Segoe-UI-Italic', 'Segoe-UI-Light', 'Segoe-UI-Light-Italic', 'Segoe-UI-Semibold', 'Segoe-UI-Semibold-Italic', 'Segoe-UI-Semilight', 'Segoe-UI-Semilight-Italic', 'Segoe-UI-Symbol', 'Segoe-UI-Variable', 'Showcard-Gothic', 'SimSun-&-NSimSun', 'SimSun-ExtB', 'Sitka-Text', 'Sitka-Text-Italic', 'Snap-ITC', 'Stencil', 'SWAstro', 'SWComp', 'SWGDT', 'SWGothe', 'SWGothg', 'SWGothi', 'SWGrekc', 'SWGreks', 'SWIsop1', 'SWIsop2', 'SWIsop3', 'SWIsot1', 'SWIsot2', 'SWIsot3', 'Swiss-721-Bold-BT', 'Swiss-721-Bold-Italic-BT', 'Swiss-721-Bold-Outline-BT', 'Swiss-721-BT', 'Swiss-721-Italic-BT', 'Swiss-721-Light-Condensed-BT', 'Swiss-721-Light-Condensed-Italic-BT', 'SWItal', 'SWItalc', 'SWItalt', 'SWLink', 'SWMap', 'SWMath', 'SWMeteo', 'SWMono', 'SWMusic', 'SWRomnc', 'SWRomnd', 'SWRomns', 'SWRomnt', 'SWScrpc', 'SWScrps', 'SWSimp', 'SWTxt', 'Sylfaen', 'Symbol', 'Symbol-Monospaced-BT', 'Symbol-Proportional-BT', 'Tahoma', 'Tahoma-Bold', 'Tempus-Sans-ITC', 'Times-New-Roman', 'Times-New-Roman-Bold', 'Times-New-Roman-Bold-Italic', 'Times-New-Roman-Italic', 'Trebuchet-MS', 'Trebuchet-MS-Bold', 'Trebuchet-MS-Bold-Italic', 'Trebuchet-MS-Italic', 'Tw-Cen-MT', 'Tw-Cen-MT-Condensed', 'Tw-Cen-MT-Condensed-Extra-Bold', 'Tw-Cen-MT-Condensed-Pogrubiony', 'Tw-Cen-MT-Kursywa', 'Tw-Cen-MT-Pogrubiona-kursywa', 'Tw-Cen-MT-Pogrubiony', 'Universal-Math-1-BT', 'Verdana', 'Verdana-Bold', 'Verdana-Bold-Italic', 'Verdana-Italic', 'Viner-Hand-ITC', 'Vivaldi-Kursywa', 'Vladimir-Script', 'Webdings', 'Wide-Latin', 'Wingdings', 'Wingdings-2', 'Wingdings-3', 'Yu-Gothic-Bold-&-Yu-Gothic-UI-Semibold-&-Yu-Gothic-UI-Bold', 'Yu-Gothic-Light-&-Yu-Gothic-UI-Light', 'Yu-Gothic-Medium-&-Yu-Gothic-UI-Regular', 'Yu-Gothic-Regular-&-Yu-Gothic-UI-Semilight']
-    
+
+
+def convert_mp3_to_wav(mp3_file_path, wav_file_path):
+    # Загрузка MP3 файла и сохранение его в формате WAV
+    audio = AudioSegment.from_mp3(mp3_file_path)
+    audio.export(wav_file_path, format="wav")
+
+def generate_subtitles(audio_file_path, output_subtitle_path):
+    # Конвертация MP3 в WAV
+    temp_wav_path = "temp.wav"
+    convert_mp3_to_wav(audio_file_path, temp_wav_path)
+
+    # Инициализация объекта для распознавания речи
+    recognizer = sr.Recognizer()
+
+    # Открытие аудиофайла в формате WAV
+    with sr.AudioFile(temp_wav_path) as source:
+        # Распознавание речи с использованием Google Web Speech API
+        audio_data = recognizer.record(source)
+        try:
+            text = recognizer.recognize_google(audio_data, language="ru-RU")
+        except sr.UnknownValueError:
+            print("Google Web Speech API не смог распознать речь.")
+            return
+        except sr.RequestError as e:
+            print(f"Ошибка при запросе к Google Web Speech API: {e}")
+            return
+
+    # Разбиение текста на слова
+    words = word_tokenize(text, language='russian')
+
+    # Создание объекта субтитров
+    subs = pysrt.SubRipFile()
+
+    # Тайм-код начала
+    start_time = 0
+
+    # Добавление каждого слова в субтитры
+    for word in words:
+        # Рассчитываем тайм-код конечного времени для каждого слова
+        end_time = start_time + len(word) / len(text) * 10  # Просто пример расчета времени
+        # Преобразуем тайм-коды в формат SubRipTime
+        start_time_srt = pysrt.SubRipTime(seconds=start_time)
+        end_time_srt = pysrt.SubRipTime(seconds=end_time)
+        # Создаем объект субтитра для текущего слова
+        subtitle = pysrt.SubRipItem(start=start_time_srt, end=end_time_srt, text=word)
+        # Добавляем субтитр в список
+        subs.append(subtitle)
+
+        # Обновляем тайм-код для следующего слова
+        start_time = end_time
+
+    # Сохранение файла с субтитрами
+    subs.save(output_subtitle_path)
+
+    print(f"Субтитры созданы и сохранены в файл: {output_subtitle_path}")
